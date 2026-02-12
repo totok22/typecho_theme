@@ -34,8 +34,8 @@ $this->need('header.php');
                 <li class="post-meta-separator">/</li>
                 <li style="<?php if ($this->options->postViewVisibleStatus != 'yes'): ?>display: none;<?php endif; ?>"><?php echo postView($this); ?> 阅读</li>
                 <li class="post-meta-separator" style="<?php if ($this->options->postViewVisibleStatus != 'yes'): ?>display: none;<?php endif; ?>">/</li>
-                <li><a href="<?php $this->permalink(); ?>#comments"><?php $this->commentsNum('暂无评论', '%d 条评论'); ?></a></li>
-                <li class="post-meta-separator">/</li>
+                <li style="<?php if ($this->options->postCommentsVisibleStatus != 'yes'): ?>display: none;<?php endif; ?>"><a href="<?php $this->permalink(); ?>#comments"><?php $this->commentsNum('暂无评论', '%d 条评论'); ?></a></li>
+                <li class="post-meta-separator" style="<?php if ($this->options->postCommentsVisibleStatus != 'yes'): ?>display: none;<?php endif; ?>">/</li>
                 <?php if ($this->options->postWordCountVisibleStatus == 'yes'): ?>
                     <li>全文约 <?php echo postWordCount($this); ?> 字</li>
                     <li class="post-meta-separator">/</li>

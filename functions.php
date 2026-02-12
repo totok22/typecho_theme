@@ -653,6 +653,32 @@ function postViewTotalCount() {
 }
 
 /**
+ * 获取私有分类的文章ID列表
+ * @return array 文章ID数组
+ */
+function getPrivatePostIds() {
+    $privateIds = getPrivateCategoryIds();
+    if (empty($privateIds)) {
+        return array();
+    }
+    
+    $db = Typecho_Db::get();
+    $prefix = $db->getPrefix();
+    $privateIdsStr = implode(',', array_map('intval', $privateIds));
+    
+    $rows = $db->fetchAll($db->query(
+        'SELECT DISTINCT cid FROM ' . $prefix . 'relationships WHERE mid IN (' . $privateIdsStr . ')'
+    ));
+    
+    $postIds = array();
+    foreach ($rows as $row) {
+        $postIds[] = $row['cid'];
+    }
+    
+    return $postIds;
+}
+
+/**
  * 生成随机推荐文章
  */
 class Widget_Post_rand extends Widget_Abstract_Contents {
@@ -678,11 +704,9 @@ class Widget_Post_rand extends Widget_Abstract_Contents {
         // 如果用户未登录，过滤私有分类的文章
         $user = Typecho_Widget::widget('Widget_User');
         if (!$user->hasLogin()) {
-            $privateIds = getPrivateCategoryIds();
-            if (!empty($privateIds)) {
-                $privateIdsStr = implode(',', array_map('intval', $privateIds));
-                $select->join('table.relationships', 'table.contents.cid = table.relationships.cid')
-                    ->where('table.relationships.mid NOT IN (' . $privateIdsStr . ')');
+            $privatePostIds = getPrivatePostIds();
+            if (!empty($privatePostIds)) {
+                $select->where('table.contents.cid NOT IN ?', $privatePostIds);
             }
         }
         
@@ -711,11 +735,9 @@ class Widget_Post_Recent_Filtered extends Widget_Abstract_Contents {
         // 如果用户未登录，过滤私有分类的文章
         $user = Typecho_Widget::widget('Widget_User');
         if (!$user->hasLogin()) {
-            $privateIds = getPrivateCategoryIds();
-            if (!empty($privateIds)) {
-                $privateIdsStr = implode(',', array_map('intval', $privateIds));
-                $select->join('table.relationships', 'table.contents.cid = table.relationships.cid')
-                    ->where('table.relationships.mid NOT IN (' . $privateIdsStr . ')');
+            $privatePostIds = getPrivatePostIds();
+            if (!empty($privatePostIds)) {
+                $select->where('table.contents.cid NOT IN ?', $privatePostIds);
             }
         }
         

@@ -31,6 +31,26 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         </style>
     <?php endif; ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css">
+    <link id="highlightThemeCss" rel="stylesheet" href="//static-lab.6os.net/highlight/11.11.1/styles/atom-one-light.min.css">
+    <script>
+        (function() {
+            try {
+                var saved = localStorage.getItem('theme-mode');
+                var defaultMode = '<?php echo $this->options->defaultThemeMode ?>';
+                var mode = saved || defaultMode;
+                if (mode === 'auto') {
+                    var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    mode = isDark ? 'dark' : 'light';
+                }
+                var highlightCss = document.getElementById('highlightThemeCss');
+                if (highlightCss) {
+                    highlightCss.href = mode === 'dark'
+                        ? '//static-lab.6os.net/highlight/11.11.1/styles/atom-one-dark.min.css'
+                        : '//static-lab.6os.net/highlight/11.11.1/styles/atom-one-light.min.css';
+                }
+            } catch (e) {}
+        })();
+    </script>
     <?php $this->header(); ?>
 </head>
 <body theme-mode="">

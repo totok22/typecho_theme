@@ -88,7 +88,6 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 <script src="//cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
 <script src="//static-lab.6os.net/highlight/11.11.1/highlight.min.js"></script>
-<link id="highlightThemeCss" rel="stylesheet" href="">
 <?php if ($this->options->pjaxStatus == 'yes'): ?>
     <script src="//static-lab.6os.net/jquery-pjax/2.0.1/jquery.pjax.min.js"></script>
     <script src="//static-lab.6os.net/nprogress/0.2.0/nprogress.min.js"></script>
@@ -463,11 +462,11 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
     // 初始化main容器
     function initMain() {
+        // 先初始化代码块复制按钮（包装pre元素）
+        initCodeCopyButton();
+
         // 代码高亮
         hljs.highlightAll();
-
-        // 初始化代码块复制按钮
-        initCodeCopyButton();
 
         // 渲染LaTeX/KaTeX数学公式
         if (typeof renderMathInElement === 'function') {
