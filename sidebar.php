@@ -28,6 +28,12 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
             <h3 class="widget-title">最新合集</h3>
             <ul class="widget-list">
                 <?php while ($tags->next()): ?>
+                    <?php
+                    // 如果标签只包含私有文章，且用户未登录，则跳过
+                    if (isTagPrivateOnly($tags->mid) && !isUserLoggedIn()) {
+                        continue;
+                    }
+                    ?>
                     <a href="<?php $tags->permalink(); ?>"><?php $tags->name(); ?></a>
                 <?php endwhile; ?>
             </ul>

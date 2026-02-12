@@ -919,3 +919,43 @@ function getPostDescription($archive) {
     
     return null;
 }
+
+/**
+ * 检查标签是否只包含私有文章
+ * @param int $tagId 标签ID
+ * @return bool true=只包含私有文章（应隐藏），false=包含公开文章（应显示）
+ */
+function isTagPrivateOnly($tagId) {
+    $db = Typecho_Db::get();
+    $prefix = $db->getPrefix();
+    
+    // 获取该标签关联的所有文章ID
+    $rows = $db->fetchAll($db->query(
+        'SELECT cid FROM ' . $prefix . 'relationships WHERE mid = ' . intval($tagId)
+    ));
+    
+    if (empty($rows)) {
+        return true; // 没有文章的标签视为私有
+    }
+    
+    $postIds = array();
+    foreach ($rows as $row) {
+        $postIds[] = $row['cid'];
+    }
+    
+    // 获取私有文章ID列表
+    $privatePostIds = getPrivatePostIds();
+    
+    if (empty($privatePostIds)) {
+        return false; // 没有私有文章，标签公开
+    }
+    
+    // 检查是否所有文章都是私有的
+    foreach ($postIds as $postId) {
+        if (!in_array($postId, $privatePostIds)) {
+            return false; // 有公开文章，标签应显示
+        }
+    }
+    
+    return true; // 所有文章都是私有的，标签应隐藏
+}
