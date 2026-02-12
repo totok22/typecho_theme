@@ -32,3 +32,6 @@
 
 * **性能优先：** 尽量减少数据库查询，充分利用 Typecho 原生函数。
 * **代码风格：** PHP 8 标准，逻辑清晰，注释详尽。
+
+
+!! git push 使用ssh方式：git remote set-url origin git@github.com:totok22/typecho_theme.git
