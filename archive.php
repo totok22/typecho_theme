@@ -1,9 +1,6 @@
 <?php
 /**
  * 文章列表页
- *
- * @author 多仔
- * @link https://www.duox.dev
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');
@@ -18,6 +15,12 @@ $this->need('header.php');
         ], '', ''); ?></h3>
     <?php if ($this->have()): ?>
         <?php while ($this->next()): ?>
+            <?php
+            // 如果文章属于私有分类，且用户未登录，则跳过
+            if (isPostPrivate($this) && !isUserLoggedIn()) {
+                continue;
+            }
+            ?>
             <article class="post">
                 <h2 class="post-title">
                     <a href="<?php $this->permalink(); ?>"><?php $this->title(); ?></a>
@@ -45,7 +48,15 @@ $this->need('header.php');
                     <?php endif; ?>
                 </ul>
                 <div class="post-summary">
-                    <?php $this->excerpt(500, ''); ?>
+                    <?php
+                    // 优先显示自定义description字段，没有则显示文章摘要
+                    $description = getPostDescription($this);
+                    if ($description) {
+                        echo $description;
+                    } else {
+                        $this->excerpt(500, '');
+                    }
+                    ?>
                 </div>
             </article>
         <?php endwhile; ?>

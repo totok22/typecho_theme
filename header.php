@@ -1,9 +1,6 @@
 <?php
 /**
  * 导航区
- *
- * @author 多仔
- * @link https://www.duox.dev
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 ?>
@@ -20,7 +17,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         ], '', ' - '); ?><?php $this->options->title(); ?></title>
     <link rel="stylesheet" href="<?php $this->options->themeUrl('css/normalize.min.css'); ?>?v=<?php echo version(); ?>">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('css/grid.min.css'); ?>?v=<?php echo version(); ?>">
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('css/style.min.css'); ?>?v=<?php echo version(); ?>">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('css/style.css'); ?>?v=<?php echo version(); ?>">
     <?php if ($this->options->faviconUrl):  ?>
         <link rel="shortcut icon" href="<?php $this->options->faviconUrl(); ?>" type="image/x-icon" />
     <?php else: ?>
@@ -83,6 +80,12 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
                     <?php if (!empty($this->options->menuBlock) && in_array('ShowCategory', $this->options->menuBlock)): ?>
                         <?php $this->widget('Widget_Metas_Category_List')->to($categories); ?>
                         <?php while ($categories->next()): ?>
+                            <?php
+                            // 如果是私有分类或其子分类，且用户未登录，则跳过
+                            if (isPrivateCategory($categories->mid) && !isUserLoggedIn()) {
+                                continue;
+                            }
+                            ?>
                             <a href="<?php $categories->permalink(); ?>"><?php $categories->name(); ?></a>
                         <?php endwhile; ?>
                     <?php endif; ?>

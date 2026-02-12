@@ -1,9 +1,6 @@
 <?php
 /**
  * 底栏区
- *
- * @author 多仔
- * @link https://www.duox.dev
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 ?>
@@ -402,10 +399,75 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 <?php endif; ?>
 <!-- 初始化 -->
 <script>
+    // 初始化代码块复制按钮
+    function initCodeCopyButton() {
+        // 遍历所有pre元素（代码块）
+        $('.post-content pre').each(function() {
+            const $pre = $(this);
+            // 避免重复添加
+            if ($pre.parent().hasClass('code-block-wrapper')) {
+                return;
+            }
+            // 创建包装器
+            const $wrapper = $('<div class="code-block-wrapper"></div>');
+            $pre.wrap($wrapper);
+            // 添加复制按钮
+            const $copyBtn = $('<button class="code-copy-btn">复制</button>');
+            $pre.parent().append($copyBtn);
+        });
+
+        // 绑定复制按钮点击事件（使用事件委托）
+        $('.post-content').off('click', '.code-copy-btn').on('click', '.code-copy-btn', function() {
+            const $btn = $(this);
+            const $pre = $btn.siblings('pre');
+            const code = $pre.text();
+
+            // 复制到剪贴板
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(function() {
+                    $btn.text('已复制').addClass('copied');
+                    setTimeout(function() {
+                        $btn.text('复制').removeClass('copied');
+                    }, 2000);
+                }).catch(function() {
+                    fallbackCopy(code, $btn);
+                });
+            } else {
+                fallbackCopy(code, $btn);
+            }
+        });
+
+        // 降级复制方案
+        function fallbackCopy(text, $btn) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                $btn.text('已复制').addClass('copied');
+                setTimeout(function() {
+                    $btn.text('复制').removeClass('copied');
+                }, 2000);
+            } catch (err) {
+                $btn.text('复制失败');
+                setTimeout(function() {
+                    $btn.text('复制');
+                }, 2000);
+            }
+            document.body.removeChild(textarea);
+        }
+    }
+
     // 初始化main容器
     function initMain() {
         // 代码高亮
         hljs.highlightAll();
+
+        // 初始化代码块复制按钮
+        initCodeCopyButton();
 
         // 渲染LaTeX/KaTeX数学公式
         if (typeof renderMathInElement === 'function') {

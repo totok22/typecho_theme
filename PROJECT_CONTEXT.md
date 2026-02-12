@@ -38,3 +38,6 @@ export PS1="\[\e[32m\]\u@\h:\[\e[34m\]\W\[\e[0m\]# "
 ```
 
 !! git push 使用ssh方式。
+
+注意参考：https://docs.typecho.org/phpcoding
+https://docs.typecho.org/plugins/advanced

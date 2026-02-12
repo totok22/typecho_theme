@@ -1,10 +1,6 @@
 <?php
 /**
  * 时间轴
- *
- * @package custom
- * @author 多仔
- * @link https://www.duox.dev
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');
@@ -16,10 +12,23 @@ $this->need('header.php');
             <div class="timeline">
                 <?php
                 $db = Typecho_Db::get();
-                $archives = $db->fetchAll($db->select()->from('table.contents')
+                $select = $db->select()->from('table.contents')
                         ->where('type = ?', 'post')
-                        ->where('status = ?', 'publish')
-                        ->order('table.contents.created', Typecho_Db::SORT_DESC));
+                        ->where('status = ?', 'publish');
+                
+                // 如果用户未登录，过滤私有分类的文章
+                $user = Typecho_Widget::widget('Widget_User');
+                if (!$user->hasLogin()) {
+                    $privateIds = getPrivateCategoryIds();
+                    if (!empty($privateIds)) {
+                        $privateIdsStr = implode(',', array_map('intval', $privateIds));
+                        $select->join('table.relationships', 'table.contents.cid = table.relationships.cid')
+                            ->where('table.relationships.mid NOT IN (' . $privateIdsStr . ')');
+                    }
+                }
+                
+                $select->order('table.contents.created', Typecho_Db::SORT_DESC);
+                $archives = $db->fetchAll($select);
 
                 $postCounts = array();
                 $allPosts = array();

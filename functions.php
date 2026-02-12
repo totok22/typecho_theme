@@ -1,9 +1,6 @@
 <?php
 /**
  * 自定义函数
- *
- * @author 多仔
- * @link https://www.duox.dev
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
@@ -132,6 +129,21 @@ function themeConfig($form) {
         [],
         '顶部菜单显示内容',
         '指定网页顶部菜单显示的菜单项来源'
+    );
+    
+    $privateCategorySettings = new Typecho_Widget_Helper_Form_Element_Checkbox(
+        'privateCategorySettings',
+        null,
+        null,
+        '<h3># 内部文章设置</h3>'
+    );
+    
+    $privateCategoryNames = new Typecho_Widget_Helper_Form_Element_Text(
+        'privateCategoryNames',
+        null,
+        null,
+        '内部文章分类名称',
+        '设置需要登录才能查看的分类名称，多个分类用英文逗号分隔（如：Internal,内部文档）。这些分类及其子分类下的文章对未登录用户隐藏。'
     );
     
     $sidebarSettings = new Typecho_Widget_Helper_Form_Element_Checkbox(
@@ -417,6 +429,10 @@ function themeConfig($form) {
     $form->addInput($menuBlock);
     $form->addInput($hr);
     
+    $form->addInput($privateCategorySettings);
+    $form->addInput($privateCategoryNames);
+    $form->addInput($hr);
+    
     $form->addInput($sidebarSettings);
     $form->addInput($sidebarStatus);
     $form->addInput($sidebarBlock);
@@ -645,9 +661,54 @@ class Widget_Post_rand extends Widget_Abstract_Contents {
             ->where('table.contents.password IS NULL OR table.contents.password = \'\'')
             ->where('table.contents.status = ?', 'publish')
             ->where('table.contents.created <= ?', time())
-            ->where('table.contents.type = ?', 'post')
-            ->limit($this->parameter->limit)
+            ->where('table.contents.type = ?', 'post');
+        
+        // 如果用户未登录，过滤私有分类的文章
+        $user = Typecho_Widget::widget('Widget_User');
+        if (!$user->hasLogin()) {
+            $privateIds = getPrivateCategoryIds();
+            if (!empty($privateIds)) {
+                $privateIdsStr = implode(',', array_map('intval', $privateIds));
+                $select->join('table.relationships', 'table.contents.cid = table.relationships.cid')
+                    ->where('table.relationships.mid NOT IN (' . $privateIdsStr . ')');
+            }
+        }
+        
+        $select->limit($this->parameter->limit)
             ->order($orderBy);
+        $this->db->fetchAll($select, array($this, 'push'));
+    }
+}
+
+/**
+ * 近期文章（过滤私有分类）
+ */
+class Widget_Post_Recent_Filtered extends Widget_Abstract_Contents {
+    public function __construct($request, $response, $params = NULL) {
+        parent::__construct($request, $response, $params);
+        $this->parameter->setDefault(array('limit' => $this->options->postsListSize, 'parentId' => 0, 'ignoreAuthor' => false));
+    }
+    
+    public function execute() {
+        $select = $this->select()->from('table.contents')
+            ->where('table.contents.password IS NULL OR table.contents.password = \'\'')
+            ->where('table.contents.status = ?', 'publish')
+            ->where('table.contents.created <= ?', time())
+            ->where('table.contents.type = ?', 'post');
+        
+        // 如果用户未登录，过滤私有分类的文章
+        $user = Typecho_Widget::widget('Widget_User');
+        if (!$user->hasLogin()) {
+            $privateIds = getPrivateCategoryIds();
+            if (!empty($privateIds)) {
+                $privateIdsStr = implode(',', array_map('intval', $privateIds));
+                $select->join('table.relationships', 'table.contents.cid = table.relationships.cid')
+                    ->where('table.relationships.mid NOT IN (' . $privateIdsStr . ')');
+            }
+        }
+        
+        $select->limit($this->parameter->limit)
+            ->order('table.contents.created', Typecho_Db::SORT_DESC);
         $this->db->fetchAll($select, array($this, 'push'));
     }
 }
@@ -687,4 +748,140 @@ function parseContent($content) {
 function version() {
     $info = Typecho_Plugin::parseInfo(__DIR__.'/index.php');
     return $info['version'];
+}
+
+/**
+ * 检查用户是否已登录
+ */
+function isUserLoggedIn() {
+    try {
+        $user = Typecho_Widget::widget('Widget_User');
+        return $user ? $user->hasLogin() : false;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * 获取私有分类及其所有子分类的ID
+ * @return array 分类ID数组
+ */
+function getPrivateCategoryIds() {
+    $options = Helper::options();
+    $db = Typecho_Db::get();
+    $categoryIds = array();
+    
+    // 从配置中获取私有分类名称
+    $privateNamesStr = isset($options->privateCategoryNames) ? trim($options->privateCategoryNames) : '';
+    if (empty($privateNamesStr)) {
+        return $categoryIds;
+    }
+    
+    // 解析分类名称（支持逗号分隔）
+    $privateNames = array_map('trim', explode(',', $privateNamesStr));
+    
+    foreach ($privateNames as $privateName) {
+        if (empty($privateName)) continue;
+        
+        // 查找指定名称的分类
+        $category = $db->fetchRow($db->select('mid')->from('table.metas')
+            ->where('type = ?', 'category')
+            ->where('name = ?', $privateName));
+        
+        if ($category) {
+            $mid = $category['mid'];
+            $categoryIds[] = $mid;
+            
+            // 递归获取所有子分类
+            $categoryIds = array_merge($categoryIds, getChildCategoryIds($db, $mid));
+        }
+    }
+    
+    return array_unique($categoryIds);
+}
+
+/**
+ * 递归获取子分类ID
+ */
+function getChildCategoryIds($db, $parentId) {
+    $ids = array();
+    $children = $db->fetchAll($db->select('mid')->from('table.metas')
+        ->where('type = ?', 'category')
+        ->where('parent = ?', $parentId));
+    
+    foreach ($children as $child) {
+        $ids[] = $child['mid'];
+        $ids = array_merge($ids, getChildCategoryIds($db, $child['mid']));
+    }
+    
+    return $ids;
+}
+
+/**
+ * 检查分类是否属于私有分类或其子分类
+ * @param int $categoryId 分类ID
+ * @return bool
+ */
+function isPrivateCategory($categoryId) {
+    if (!is_numeric($categoryId)) {
+        return false;
+    }
+    $privateIds = getPrivateCategoryIds();
+    return in_array((int)$categoryId, $privateIds);
+}
+
+/**
+ * 检查文章是否属于私有分类或其子分类
+ * @param Widget_Archive $archive 文章对象
+ * @return bool
+ */
+function isPostPrivate($archive) {
+    // 安全检查：确保archive对象和categories属性存在
+    if (!is_object($archive)) {
+        return false;
+    }
+    
+    $categories = null;
+    if (isset($archive->categories)) {
+        $categories = $archive->categories;
+    }
+    
+    if ($categories && is_array($categories)) {
+        foreach ($categories as $category) {
+            if (isset($category['mid']) && isPrivateCategory($category['mid'])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * 获取文章的description自定义字段
+ * @param Widget_Archive $archive 文章对象
+ * @return string|null
+ */
+function getPostDescription($archive) {
+    // 安全检查：确保archive对象和fields属性存在
+    if (!is_object($archive)) {
+        return null;
+    }
+    
+    if (!isset($archive->fields)) {
+        return null;
+    }
+    
+    $fields = $archive->fields;
+    if (!is_object($fields) && !is_array($fields)) {
+        return null;
+    }
+    
+    // 尝试获取description字段
+    if (is_object($fields) && isset($fields->description)) {
+        return $fields->description ? $fields->description : null;
+    } elseif (is_array($fields) && isset($fields['description'])) {
+        return $fields['description'] ? $fields['description'] : null;
+    }
+    
+    return null;
 }

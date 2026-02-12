@@ -1,9 +1,6 @@
 <?php
 /**
  * 侧栏区
- *
- * @author 多仔
- * @link https://www.duox.dev
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 ?>
@@ -12,7 +9,16 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         <section class="widget">
             <h3 class="widget-title">文章分类</h3>
             <ul class="widget-list">
-                <?php $this->widget('Widget_Metas_Category_List')->parse('<a href="{permalink}">{name}</a>'); ?>
+                <?php $this->widget('Widget_Metas_Category_List')->to($categoryList); ?>
+                <?php while ($categoryList->next()): ?>
+                    <?php
+                    // 如果是私有分类或其子分类，且用户未登录，则跳过
+                    if (isPrivateCategory($categoryList->mid) && !isUserLoggedIn()) {
+                        continue;
+                    }
+                    ?>
+                    <a href="<?php $categoryList->permalink(); ?>"><?php $categoryList->name(); ?></a>
+                <?php endwhile; ?>
             </ul>
         </section>
     <?php endif; ?>
@@ -42,7 +48,10 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         <section class="widget">
             <h3 class="widget-title">近期文章</h3>
             <ul class="widget-list">
-                <?php $this->widget('Widget_Contents_Post_Recent')->parse('<li><a href="{permalink}">{title}</a></li>'); ?>
+                <?php $this->widget('Widget_Post_Recent_Filtered@recent')->to($recentPosts); ?>
+                <?php while ($recentPosts->next()): ?>
+                    <li><a href="<?php $recentPosts->permalink(); ?>"><?php $recentPosts->title(); ?></a></li>
+                <?php endwhile; ?>
             </ul>
         </section>
     <?php endif; ?>

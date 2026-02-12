@@ -1,9 +1,6 @@
 <?php
 /**
  * 独立页
- *
- * @author 多仔
- * @link https://www.duox.dev
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');
