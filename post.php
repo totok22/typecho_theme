@@ -23,6 +23,8 @@ $this->need('header.php');
             <ul class="post-meta">
                 <li><?php $this->date(); ?></li>
                 <li class="post-meta-separator">/</li>
+                <li><?php $this->author->screenName(); ?></li>
+                <li class="post-meta-separator">/</li>
                 <li>
                     <?php $this->category(','); ?>
                     <?php if ($this->tags): ?>

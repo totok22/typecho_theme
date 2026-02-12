@@ -272,6 +272,17 @@ function themeConfig($form) {
         '开启后，将在首页、文章列表页、文章页自动计算并显示文章阅读数'
     );
     
+    $postCommentsVisibleStatus = new Typecho_Widget_Helper_Form_Element_Radio(
+        'postCommentsVisibleStatus',
+        [
+            'yes'   => '是',
+            'no'    => '否'
+        ],
+        'no',
+        '是否显示文章评论数',
+        '开启后，将在首页、文章列表页显示文章评论数'
+    );
+    
     $randMinPostView = new Typecho_Widget_Helper_Form_Element_Text(
         'randMinPostView',
         null,
@@ -447,6 +458,7 @@ function themeConfig($form) {
     $form->addInput($postReadingTimeVisibleStatus);
     $form->addInput($readingSpeed);
     $form->addInput($postViewVisibleStatus);
+    $form->addInput($postCommentsVisibleStatus);
     $form->addInput($randMinPostView);
     $form->addInput($randMaxPostView);
     $form->addInput($elinkTargetBlankStatus);
