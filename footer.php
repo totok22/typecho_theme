@@ -61,7 +61,30 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
     <div class="toc-overlay"></div>
 <?php endif; ?>
 <footer id="footer">
-    <?php $this->options->footerText(); ?><br>
+    <?php $this->options->footerText(); ?>
+    <div class="footer-powered">
+        Powered by <a href="https://typecho.org/" target="_blank" rel="noopener noreferrer">Typecho</a>
+    </div>
+    <?php 
+    $icpBeian = $this->options->icpBeian;
+    $policeBeian = $this->options->policeBeian;
+    if (!empty($icpBeian) || !empty($policeBeian)): 
+    ?>
+    <div class="beian-strip">
+        <?php if (!empty($policeBeian)): ?>
+            <a href="http://www.beian.gov.cn/" target="_blank" rel="noopener noreferrer">
+                <img src="<?php $this->options->themeUrl('images/beian-icon.png'); ?>" alt="公安备案图标" />
+                <span><?php echo $policeBeian; ?></span>
+            </a>
+        <?php endif; ?>
+        <?php if (!empty($icpBeian) && !empty($policeBeian)): ?>
+            <span class="divider">|</span>
+        <?php endif; ?>
+        <?php if (!empty($icpBeian)): ?>
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer"><?php echo $icpBeian; ?></a>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
 </footer>
 <?php $this->options->analyticsCode(); ?>
 <script src="//static-lab.6os.net/jquery/3.6.0/jquery.min.js"></script>

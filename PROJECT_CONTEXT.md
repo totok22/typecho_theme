@@ -37,4 +37,4 @@
 export PS1="\[\e[32m\]\u@\h:\[\e[34m\]\W\[\e[0m\]# "
 ```
 
-!! git push 使用ssh方式：git remote set-url origin git@github.com:totok22/typecho_theme.git
+!! git push 使用ssh方式。

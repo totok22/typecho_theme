@@ -630,6 +630,53 @@ button:hover,input[type=submit]:hover {
     border-top: 1px solid var(--border-color)
 }
 
+.footer-powered {
+    margin-top: 0.5em;
+}
+
+.footer-powered a {
+    color: var(--link-color);
+}
+
+.beian-strip {
+    margin-top: 0.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+.beian-strip a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s;
+}
+
+.beian-strip a:hover {
+    color: var(--text-color);
+}
+
+.beian-strip img {
+    width: 14px;
+    height: 14px;
+}
+
+.beian-strip .divider {
+    opacity: 0.3;
+}
+
+@media (max-width: 600px) {
+    .beian-strip {
+        font-size: 11px;
+        gap: 12px;
+    }
+}
+
 /* ------------------
  * 悬浮工具区样式
  * --------------- */

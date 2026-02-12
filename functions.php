@@ -69,6 +69,22 @@ function themeConfig($form) {
         '指定网站统计工具（如百度统计、Google Analytics 等）的嵌入代码'
     );
     
+    $icpBeian = new Typecho_Widget_Helper_Form_Element_Text(
+        'icpBeian',
+        null,
+        null,
+        'ICP 备案号',
+        '填写 ICP 备案号，如：京ICP备12345678号-1，留空则不显示'
+    );
+    
+    $policeBeian = new Typecho_Widget_Helper_Form_Element_Text(
+        'policeBeian',
+        null,
+        null,
+        '公网安备号',
+        '填写公安联网备案号，如：京公网安备 11010502000000号，留空则不显示'
+    );
+    
     $themeModeSettings = new Typecho_Widget_Helper_Form_Element_Checkbox(
         'themeModeSettings',
         null,
@@ -388,6 +404,8 @@ function themeConfig($form) {
     $form->addInput($faviconUrl);
     $form->addInput($footerText);
     $form->addInput($analyticsCode);
+    $form->addInput($icpBeian);
+    $form->addInput($policeBeian);
     $form->addInput($hr);
     
     $form->addInput($themeModeSettings);
