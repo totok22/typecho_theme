@@ -653,13 +653,21 @@ function postViewTotalCount() {
 }
 
 /**
- * 获取私有分类的文章ID列表
+ * 获取私有分类的文章ID列表（带缓存）
  * @return array 文章ID数组
  */
 function getPrivatePostIds() {
+    static $cachedPostIds = null;
+    
+    // 如果已经缓存，直接返回
+    if ($cachedPostIds !== null) {
+        return $cachedPostIds;
+    }
+    
     $privateIds = getPrivateCategoryIds();
     if (empty($privateIds)) {
-        return array();
+        $cachedPostIds = array();
+        return $cachedPostIds;
     }
     
     $db = Typecho_Db::get();
@@ -675,7 +683,8 @@ function getPrivatePostIds() {
         $postIds[] = $row['cid'];
     }
     
-    return $postIds;
+    $cachedPostIds = $postIds;
+    return $cachedPostIds;
 }
 
 /**
@@ -797,10 +806,17 @@ function isUserLoggedIn() {
 }
 
 /**
- * 获取私有分类及其所有子分类的ID
+ * 获取私有分类及其所有子分类的ID（带缓存）
  * @return array 分类ID数组
  */
 function getPrivateCategoryIds() {
+    static $cachedIds = null;
+    
+    // 如果已经缓存，直接返回
+    if ($cachedIds !== null) {
+        return $cachedIds;
+    }
+    
     $options = Helper::options();
     $db = Typecho_Db::get();
     $categoryIds = array();
@@ -808,7 +824,8 @@ function getPrivateCategoryIds() {
     // 从配置中获取私有分类名称
     $privateNamesStr = isset($options->privateCategoryNames) ? trim($options->privateCategoryNames) : '';
     if (empty($privateNamesStr)) {
-        return $categoryIds;
+        $cachedIds = $categoryIds;
+        return $cachedIds;
     }
     
     // 解析分类名称（支持逗号分隔）
@@ -831,13 +848,21 @@ function getPrivateCategoryIds() {
         }
     }
     
-    return array_unique($categoryIds);
+    $cachedIds = array_unique($categoryIds);
+    return $cachedIds;
 }
 
 /**
- * 递归获取子分类ID
+ * 递归获取子分类ID（带缓存）
  */
 function getChildCategoryIds($db, $parentId) {
+    static $childrenCache = array();
+    
+    // 如果已经缓存，直接返回
+    if (isset($childrenCache[$parentId])) {
+        return $childrenCache[$parentId];
+    }
+    
     $ids = array();
     $children = $db->fetchAll($db->select('mid')->from('table.metas')
         ->where('type = ?', 'category')
@@ -848,6 +873,7 @@ function getChildCategoryIds($db, $parentId) {
         $ids = array_merge($ids, getChildCategoryIds($db, $child['mid']));
     }
     
+    $childrenCache[$parentId] = $ids;
     return $ids;
 }
 
@@ -921,11 +947,18 @@ function getPostDescription($archive) {
 }
 
 /**
- * 检查标签是否只包含私有文章
+ * 检查标签是否只包含私有文章（带缓存）
  * @param int $tagId 标签ID
  * @return bool true=只包含私有文章（应隐藏），false=包含公开文章（应显示）
  */
 function isTagPrivateOnly($tagId) {
+    static $tagCache = array();
+    
+    // 如果已经缓存，直接返回
+    if (isset($tagCache[$tagId])) {
+        return $tagCache[$tagId];
+    }
+    
     $db = Typecho_Db::get();
     $prefix = $db->getPrefix();
     
@@ -935,7 +968,8 @@ function isTagPrivateOnly($tagId) {
     ));
     
     if (empty($rows)) {
-        return true; // 没有文章的标签视为私有
+        $tagCache[$tagId] = true; // 没有文章的标签视为私有
+        return true;
     }
     
     $postIds = array();
@@ -943,19 +977,22 @@ function isTagPrivateOnly($tagId) {
         $postIds[] = $row['cid'];
     }
     
-    // 获取私有文章ID列表
+    // 获取私有文章ID列表（已缓存）
     $privatePostIds = getPrivatePostIds();
     
     if (empty($privatePostIds)) {
-        return false; // 没有私有文章，标签公开
+        $tagCache[$tagId] = false; // 没有私有文章，标签公开
+        return false;
     }
     
     // 检查是否所有文章都是私有的
     foreach ($postIds as $postId) {
         if (!in_array($postId, $privatePostIds)) {
-            return false; // 有公开文章，标签应显示
+            $tagCache[$tagId] = false; // 有公开文章，标签应显示
+            return false;
         }
     }
     
-    return true; // 所有文章都是私有的，标签应隐藏
+    $tagCache[$tagId] = true; // 所有文章都是私有的，标签应隐藏
+    return true;
 }
