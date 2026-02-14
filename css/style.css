@@ -1035,3 +1035,102 @@ pre {
     color: #28a745;
     border-color: #28a745
 }
+
+/* ------------------
+ * Markdown 原文复制按钮样式
+ * --------------- */
+.post-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.md-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-family: var(--body-font-famliy);
+    color: var(--secondary-color);
+    background-color: var(--muted-color);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.md-copy-btn:hover {
+    color: var(--link-color);
+    background-color: var(--bg-color);
+    border-color: var(--link-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.md-copy-btn:active {
+    transform: scale(0.95);
+}
+
+.md-copy-btn svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
+
+.md-copy-btn.copied {
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+    border-color: rgba(40, 167, 69, 0.35);
+}
+
+.md-copy-btn.copied .check-icon {
+    color: #28a745;
+}
+
+/* 暗色模式适配 */
+[theme-mode="dark"] .md-copy-btn {
+    background-color: #2d2d2d;
+    border-color: #3d3d3d;
+    color: #a0a0a0;
+}
+
+[theme-mode="dark"] .md-copy-btn:hover {
+    border-color: #6B92C7;
+    background-color: #3d3d3d;
+    color: #e0e0e0;
+}
+
+[theme-mode="dark"] .md-copy-btn.copied {
+    background-color: rgba(40, 167, 69, 0.15);
+    border-color: rgba(40, 167, 69, 0.4);
+    color: #5cdb7d;
+}
+
+/* 护眼模式适配 */
+[theme-mode="read"] .md-copy-btn {
+    background-color: #e8e6de;
+    border-color: #dcdad2;
+}
+
+[theme-mode="read"] .md-copy-btn:hover {
+    background-color: #dcdad2;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .md-copy-btn {
+        margin-top: 8px;
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+    
+    .md-copy-btn svg {
+        width: 12px;
+        height: 12px;
+    }
+}

@@ -398,6 +398,61 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 <?php endif; ?>
 <!-- 初始化 -->
 <script>
+    // Markdown 原文复制按钮
+    function initMdCopyButton() {
+        const $mdCopyBtn = $('#mdCopyBtn');
+        const $mdContent = $('#mdContent');
+        
+        if ($mdCopyBtn.length === 0) {
+            return;
+        }
+        
+        $mdCopyBtn.on('click', function() {
+            const markdownText = $mdContent.val();
+            
+            if (markdownText) {
+                // 复制到剪贴板
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(markdownText).then(function() {
+                        showCopiedState();
+                    }).catch(function() {
+                        fallbackCopy(markdownText);
+                    });
+                } else {
+                    fallbackCopy(markdownText);
+                }
+            }
+        });
+        
+        function showCopiedState() {
+            $mdCopyBtn.addClass('copied');
+            $mdCopyBtn.find('.copy-icon').hide();
+            $mdCopyBtn.find('.check-icon').show();
+            $mdCopyBtn.find('.copy-text').text('已复制全文');
+            
+            setTimeout(function() {
+                $mdCopyBtn.removeClass('copied');
+                $mdCopyBtn.find('.copy-icon').show();
+                $mdCopyBtn.find('.check-icon').hide();
+                $mdCopyBtn.find('.copy-text').text('复制');
+            }, 2500);
+        }
+        
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showCopiedState();
+            } catch (err) {}
+            document.body.removeChild(textarea);
+        }
+    }
+    
     // 初始化代码块复制按钮
     function initCodeCopyButton() {
         // 遍历所有pre元素（代码块）
@@ -463,6 +518,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
     // 初始化main容器
     function initMain() {
         // 先初始化代码块复制按钮（包装pre元素）
+        initMdCopyButton();
         initCodeCopyButton();
 
         // 代码高亮
