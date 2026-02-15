@@ -90,6 +90,67 @@ $this->need('header.php');
         </ul>
     </article>
     <?php endif; ?>
+    
+    <?php if ($this->options->sidebarStatus == 'yes'): ?>
+        <!-- 文章详情页侧边栏内容（文章分类、最新合集等）放到文章下方 -->
+        <div class="post-sidebar-bottom">
+            <?php if (!empty($this->options->sidebarBlock) && in_array('ShowCategory', $this->options->sidebarBlock)): ?>
+                <section class="widget">
+                    <h3 class="widget-title">文章分类</h3>
+                    <ul class="widget-list">
+                        <?php $this->widget('Widget_Metas_Category_List')->to($categoryList); ?>
+                        <?php while ($categoryList->next()): ?>
+                            <?php
+                            if (isPrivateCategory($categoryList->mid) && !isUserLoggedIn()) {
+                                continue;
+                            }
+                            ?>
+                            <a href="<?php $categoryList->permalink(); ?>"><?php $categoryList->name(); ?></a>
+                        <?php endwhile; ?>
+                    </ul>
+                </section>
+            <?php endif; ?>
+            <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRecentTags', $this->options->sidebarBlock)): ?>
+                <?php $this->widget('Widget_Metas_Tag_Cloud', 'sort=mid&ignoreZeroCount=0&desc=1&limit=10')->to($tags); ?>
+                <section class="widget">
+                    <h3 class="widget-title">最新合集</h3>
+                    <ul class="widget-list">
+                        <?php while ($tags->next()): ?>
+                            <?php
+                            if (isTagPrivateOnly($tags->mid) && !isUserLoggedIn()) {
+                                continue;
+                            }
+                            ?>
+                            <a href="<?php $tags->permalink(); ?>"><?php $tags->name(); ?></a>
+                        <?php endwhile; ?>
+                    </ul>
+                </section>
+            <?php endif; ?>
+            <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRandPosts', $this->options->sidebarBlock)): ?>
+                <?php $this->widget('Widget_Post_rand@rand-post')->to($rand); ?>
+                <section class="widget">
+                    <h3 class="widget-title">随机推荐</h3>
+                    <ul class="widget-list">
+                        <?php while ($rand->next()): ?>
+                            <li><a href="<?php $rand->permalink(); ?>"><?php $rand->title(); ?></a></li>
+                        <?php endwhile; ?>
+                    </ul>
+                </section>
+            <?php endif; ?>
+            <?php if (!empty($this->options->sidebarBlock) && in_array('ShowRecentPosts', $this->options->sidebarBlock)): ?>
+                <section class="widget">
+                    <h3 class="widget-title">近期文章</h3>
+                    <ul class="widget-list">
+                        <?php $this->widget('Widget_Post_Recent_Filtered@recent-post')->to($recentPosts); ?>
+                        <?php while ($recentPosts->next()): ?>
+                            <li><a href="<?php $recentPosts->permalink(); ?>"><?php $recentPosts->title(); ?></a></li>
+                        <?php endwhile; ?>
+                    </ul>
+                </section>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+    
     <?php $this->need('comments.php'); ?>
 </div>
 <?php $this->options->sidebarStatus == 'yes' ? $this->need('sidebar.php') : ''; ?>

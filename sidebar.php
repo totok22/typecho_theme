@@ -1,10 +1,21 @@
 <?php
 /**
  * 侧栏区
+ * 文章详情页：只显示目录（宽屏时在右侧侧边栏）
+ * 列表页：显示所有侧边栏内容
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+
+// 判断是否为文章详情页
+$isPostPage = $this->is('post') || $this->is('page');
 ?>
 <div class="col-sm-12 col-md-4" id="sidebar" style="<?php if ($this->options->sidebarStickyStatus == 'yes'): ?>position: sticky; top: 10px; align-items: flex-start; align-self: start<?php endif; ?>">
+    <?php if ($this->options->tocMinitoolStatus == 'yes'): ?>
+        <div class="sidebar-toc-panel" id="sidebarTocPanel" style="display: none;"></div>
+    <?php endif; ?>
+    
+    <?php if (!$isPostPage): ?>
+    <?php // 列表页显示所有侧边栏内容 ?>
     <?php if (!empty($this->options->sidebarBlock) && in_array('ShowCategory', $this->options->sidebarBlock)): ?>
         <section class="widget">
             <h3 class="widget-title">文章分类</h3>
@@ -91,5 +102,6 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
                 <li>评论总数：<?php echo commentTotalCount(); ?></li>
             </ul>
         </section>
+    <?php endif; ?>
     <?php endif; ?>
 </div>

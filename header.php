@@ -82,17 +82,18 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
             </div>
             <div class="site-helper col-md-6 col-sm-12">
                 <form id="search" method="post" action="<?php $this->options->siteUrl(); ?>">
-                    <input type="text" id="s" name="s" class="text" placeholder="请输入关键字搜索"/>
-                    <button type="submit" class="submit">搜索</button>
-                </form>
+                        <input type="text" id="s" name="s" class="text" placeholder="请输入关键字搜索"/>
+                        <span class="search-shortcut-hint">/</span>
+                        <button type="submit" class="submit">搜索</button>
+                    </form>
                 <div id="themeMode-selector" style="<?php if ($this->options->themeModeSelectStatus != 'yes'): ?>display: none<?php endif; ?>">
-                    <select id="themeMode">
-                        <option value="auto">跟随系统</option>
-                        <option value="light">亮色模式</option>
-                        <option value="dark">深色模式</option>
-                        <option value="read">护眼模式</option>
-                    </select>
-                </div>
+                        <select id="themeMode">
+                            <option value="auto">跟随系统</option>
+                            <option value="light">亮色模式</option>
+                            <option value="dark">深色模式</option>
+                            <option value="read">护眼模式</option>
+                        </select>
+                    </div>
             </div>
             <div class="col-md-12">
                 <nav id="nav-menu" class="clearfix">
@@ -122,4 +123,4 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 </header>
 <div id="body">
     <div class="container-md">
-        <div class="row">
+        <div class="row" id="pjax-container">

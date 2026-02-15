@@ -5,9 +5,11 @@
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 ?>
 </div></div></div>
+<!-- 阅读进度条 -->
+<div class="reading-progress-bar" id="readingProgressBar"></div>
 <div class="minitool-group">
     <?php if (class_exists('playback_Plugin') && $this->options->playbackMinitoolStatus == 'yes'): ?>
-        <button class="vertical-btn playback-minitool" id="enterPlayback" style="display: none">
+        <button class="vertical-btn playback-minitool" id="enterPlayback" data-tooltip="放映模式" style="display: none">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-collection-play" viewBox="0 0 16 16">
                 <path d="M2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3m2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1m2.765 5.576A.5.5 0 0 0 6 7v5a.5.5 0 0 0 .765.424l4-2.5a.5.5 0 0 0 0-.848z"/>
                 <path d="M1.5 14.5A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5zm13-1a.5.5 0 0 0 .5-.5V6a.5.5 0 0 0-.5-.5h-13A.5.5 0 0 0 1 6v7a.5.5 0 0 0 .5.5z"/>
@@ -15,14 +17,14 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         </button>
     <?php endif; ?>
     <?php if ($this->options->tocMinitoolStatus == 'yes'): ?>
-        <button class="vertical-btn toc-minitool">
+        <button class="vertical-btn toc-minitool" data-tooltip="目录 (T)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-ul" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
             </svg>
         </button>
     <?php endif; ?>
     <?php if ($this->options->themeModeSelectStatus == 'yes' && $this->options->themeModeMinitoolStatus == 'yes'): ?>
-        <button class="vertical-btn themeMode-minitool">
+        <button class="vertical-btn themeMode-minitool" data-tooltip="切换主题 (M)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun" viewBox="0 0 16 16">
                 <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
             </svg>
@@ -36,7 +38,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         </button>
     <?php endif; ?>
     <?php if ($this->options->topMinitoolStatus == 'yes'): ?>
-        <button class="vertical-btn top-minitool">
+        <button class="vertical-btn top-minitool" data-tooltip="返回顶部 (G)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-bar-up" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M3.646 11.854a.5.5 0 0 0 .708 0L8 8.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708M2.4 5.2c0 .22.18.4.4.4h10.4a.4.4 0 0 0 0-.8H2.8a.4.4 0 0 0-.4.4"/>
             </svg>
@@ -47,11 +49,18 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
     <div class="toc-panel">
         <div class="toc-header">
             <h3>目录</h3>
-            <button class="toc-close">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                </svg>
-            </button>
+            <div class="toc-header-actions">
+                <button class="toc-action-btn toc-toggle-all-btn" title="全部展开/折叠">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8zM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10z"/>
+                    </svg>
+                </button>
+                <button class="toc-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
         <div class="toc-container"></div>
     </div>
@@ -179,6 +188,20 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 <?php if ($this->options->tocMinitoolStatus == 'yes'): ?>
     <!-- TOC -->
     <script>
+        // 全部展开/折叠状态
+        let isAllExpanded = <?php echo($this->options->tocDefaultExpandedStatus == 'yes' ? 'true' : 'false'); ?>;
+        // 用于防止滚动事件覆盖点击高亮
+        let isClickScrolling = false;
+        let clickScrollTimeout = null;
+        
+        // 宽屏断点
+        const TOC_WIDE_BREAKPOINT = 768;
+        
+        // 检测是否宽屏
+        function isWideScreen() {
+            return window.innerWidth >= TOC_WIDE_BREAKPOINT;
+        }
+        
         // 初始化TOC目录
         function initToc() {
             const DEFAULT_TOC_VISIBLE = <?php echo($this->options->tocDefaultVisibleStatus == 'yes' ? 'true' : 'false'); ?>;
@@ -186,11 +209,16 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
             const $tocMinitool = $('.toc-minitool');
             const $tocPanel = $('.toc-panel');
-            const $tocContainer = $('.toc-container');
+            const $tocContainer = $('.toc-panel .toc-container');
             const $tocOverlay = $('.toc-overlay');
             const $postContent = $('.post-content');
+            const $sidebarTocPanel = $('#sidebarTocPanel');
 
+            // 清空目录内容
             $tocContainer.html('');
+            if ($sidebarTocPanel.length) {
+                $sidebarTocPanel.html('').hide();
+            }
 
             // 文章内容不存在
             if ($postContent.length === 0) {
@@ -238,19 +266,17 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
             // 遍历标题生成目录项
             $headings.each(function (index) {
                 const headingId = `heading-${index}`;
-                $(this).attr('id', headingId); // 给标题添加唯一ID用于锚点跳转
+                $(this).attr('id', headingId);
                 const currentLevel = parseInt($(this).prop('tagName').replace('H', '')) - levelOffset;
                 const headingText = $(this).text().trim();
                 const hasChildren = headingHasChildren[index];
 
-                // 处理层级嵌套
                 if (currentLevel > prevLevel) {
                     tocHTML += '<ul class="toc-sublist">';
                 } else if (currentLevel < prevLevel) {
                     tocHTML += '</ul>'.repeat(prevLevel - currentLevel);
                 }
 
-                // 生成目录项HTML
                 const collapsedClass = hasChildren && !DEFAULT_TOC_EXPANDED ? ' collapsed' : '';
                 tocHTML += `<li class="toc-item ${hasChildren ? 'has-children' : ''}${collapsedClass}" data-id="${headingId}" data-level="${currentLevel}">`;
                 if (hasChildren) {
@@ -261,50 +287,97 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
                 prevLevel = currentLevel;
             });
 
-            // 闭合剩余的列表标签
             tocHTML += '</ul>'.repeat(prevLevel);
             $tocContainer.html(tocHTML);
+            
+            // 宽屏时把目录面板内容复制到侧边栏
+            if (isWideScreen() && $sidebarTocPanel.length) {
+                // 创建侧边栏目录HTML
+                let sidebarHtml = '<div class="toc-header">';
+                sidebarHtml += '<h3>目录</h3>';
+                sidebarHtml += '<div class="toc-header-actions">';
+                sidebarHtml += '<button class="toc-action-btn toc-toggle-all-btn" title="全部展开/折叠">';
+                sidebarHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">';
+                sidebarHtml += '<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8zM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10z"/>';
+                sidebarHtml += '</svg>';
+                sidebarHtml += '</button>';
+                sidebarHtml += '</div>';
+                sidebarHtml += '</div>';
+                sidebarHtml += '<div class="toc-container">' + tocHTML + '</div>';
+                
+                $sidebarTocPanel.html(sidebarHtml).show();
+                
+                // 更新展开/折叠按钮状态
+                if (isAllExpanded) {
+                    $('.toc-toggle-all-btn').addClass('expanded');
+                }
+            }
 
-            // 绑定目录点击事件
-            $tocContainer.off('click');
-            $tocContainer.on('click', function (e) {
+            // 绑定目录点击事件（使用事件委托）
+            function bindTocClick() {
+                // 窄屏面板的目录点击
+                $tocContainer.off('click').on('click', function (e) {
+                    handleTocItemClick(e);
+                });
+                
+                // 宽屏侧边栏的目录点击
+                if ($sidebarTocPanel.length) {
+                    $sidebarTocPanel.off('click').on('click', function (e) {
+                        handleTocItemClick(e);
+                    });
+                }
+            }
+            
+            // 处理目录项点击
+            function handleTocItemClick(e) {
                 const $tocItem = $(e.target).closest('.toc-item');
                 const $toggleIcon = $(e.target).closest('.toc-toggle');
 
-                // 处理展开/折叠按钮
                 if ($toggleIcon.length && $tocItem.length) {
                     $tocItem.toggleClass('collapsed');
                     return;
                 }
 
-                // 处理目录项点击
                 if ($tocItem.length) {
                     const targetId = $tocItem.data('id');
                     const $targetElement = $(`#${targetId}`);
                     if ($targetElement.length) {
+                        isClickScrolling = true;
+                        if (clickScrollTimeout) {
+                            clearTimeout(clickScrollTimeout);
+                        }
+                        
+                        $('.toc-item.toc-active').removeClass('toc-active');
+                        $tocItem.addClass('toc-active');
+                        
                         $targetElement[0].scrollIntoView({
                             behavior: 'auto',
                             block: 'start'
                         });
+                        
+                        clickScrollTimeout = setTimeout(function() {
+                            isClickScrolling = false;
+                        }, 300);
                     }
                 }
-            });
-
-            // 设置TOC初始可见状态
-            if (DEFAULT_TOC_VISIBLE) {
-                $tocMinitool.click();
             }
+            
+            bindTocClick();
 
-            // 阻止事件冒泡
-            $tocContainer.on('click', function (e) {
-                e.stopPropagation();
-            });
+            // 窄屏时根据默认设置显示
+            if (!isWideScreen() && DEFAULT_TOC_VISIBLE) {
+                $tocPanel.addClass('active');
+                $tocOverlay.addClass('active');
+            }
         }
 
         // TOC目录高亮
         function highlightToc() {
-            let currentId = null;
-            const viewportTop = 50; // 视口顶部偏移量
+            if (typeof isClickScrolling !== 'undefined' && isClickScrolling) {
+                return;
+            }
+            
+            const viewportTop = 50;
 
             const $postContent = $('.post-content');
             const $headings = $postContent.find('h1, h2, h3, h4, h5, h6');
@@ -312,7 +385,6 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
                 return;
             }
 
-            // 文章内容超出视口，取消高亮
             const postContentRect = $postContent[0].getBoundingClientRect();
             const isPostContentOutOfView = (
                 postContentRect.bottom < 0 ||
@@ -324,54 +396,185 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
                 return;
             }
 
-            // 找到当前视口内最顶部的标题
+            let currentId = null;
+            let bestMatch = null;
+            
             for (let i = 0; i < $headings.length; i++) {
                 const $heading = $headings.eq(i);
                 const rect = $heading[0].getBoundingClientRect();
-                const isTouchedTop = rect.top <= viewportTop;
-
-                // 检查是否为最后一个可见标题
-                let isLastTouched = true;
-                for (let j = i + 1; j < $headings.length; j++) {
-                    const nextRect = $headings.eq(j)[0].getBoundingClientRect();
-                    if (nextRect.top <= viewportTop) {
-                        isLastTouched = false;
-                        break;
-                    }
-                }
-
-                if (isTouchedTop && isLastTouched) {
-                    currentId = $heading.attr('id');
-                    break;
+                
+                if (rect.top <= viewportTop) {
+                    bestMatch = $heading.attr('id');
                 }
             }
+            
+            if (bestMatch) {
+                currentId = bestMatch;
+            }
 
-            // 更新高亮状态
             $('.toc-item.toc-active').removeClass('toc-active');
-            const $currentTocItem = $(`.toc-item[data-id="${currentId}"]`);
-            if ($currentTocItem.length) {
-                $currentTocItem.addClass('toc-active');
+            if (currentId) {
+                const $currentTocItem = $(`.toc-item[data-id="${currentId}"]`);
+                if ($currentTocItem.length) {
+                    $currentTocItem.addClass('toc-active');
 
-                // 自动展开父级目录
-                let $parentItem = $currentTocItem.closest('.toc-sublist')?.prev();
-                while ($parentItem && $parentItem.hasClass('toc-item')) {
-                    if ($parentItem.hasClass('has-children')) {
-                        $parentItem.removeClass('collapsed');
+                    let $parentList = $currentTocItem.parent('.toc-sublist');
+                    while ($parentList.length > 0) {
+                        const $parentItem = $parentList.prev('.toc-item.has-children');
+                        if ($parentItem.length) {
+                            $parentItem.removeClass('collapsed');
+                        }
+                        $parentList = $parentList.parent().closest('.toc-sublist');
                     }
-                    $parentItem = $parentItem.closest('.toc-sublist')?.prev();
+                    
+                    // 自动滚动目录，使当前高亮项可见
+                    scrollTocToActive($currentTocItem);
+                }
+            }
+        }
+        
+        // 目录自动滚动到当前高亮项
+        function scrollTocToActive($activeItem) {
+            if (!$activeItem || $activeItem.length === 0) return;
+            
+            // 宽屏时滚动侧边栏目录
+            if (isWideScreen()) {
+                const $sidebarPanel = $('#sidebarTocPanel');
+                if ($sidebarPanel.length === 0) return;
+                
+                const panel = $sidebarPanel[0];
+                const item = $activeItem[0];
+                
+                const panelRect = panel.getBoundingClientRect();
+                const itemRect = item.getBoundingClientRect();
+                
+                // 计算item相对于panel的位置
+                const panelTop = panelRect.top;
+                const panelBottom = panelRect.bottom;
+                const panelHeight = panel.clientHeight;
+                const itemTop = itemRect.top;
+                const itemBottom = itemRect.bottom;
+                const itemHeight = $activeItem.outerHeight();
+                
+                // 计算item在panel内的相对位置
+                const itemOffsetTop = item.offsetTop;
+                const currentScrollTop = panel.scrollTop;
+                
+                // 定义边距
+                const topMargin = 80; // 顶部留出更多空间（考虑header）
+                const bottomMargin = 30; // 底部边距
+                
+                // 计算目标滚动位置
+                let targetScrollTop = currentScrollTop;
+                
+                // 如果item在可视区域上方
+                if (itemTop < panelTop + topMargin) {
+                    targetScrollTop = itemOffsetTop - topMargin;
+                }
+                // 如果item在可视区域下方
+                else if (itemBottom > panelBottom - bottomMargin) {
+                    targetScrollTop = itemOffsetTop - panelHeight + itemHeight + bottomMargin;
+                }
+                
+                // 只有当需要滚动时才执行
+                if (Math.abs(targetScrollTop - currentScrollTop) > 5) {
+                    panel.scrollTo({
+                        top: Math.max(0, targetScrollTop),
+                        behavior: 'smooth'
+                    });
+                }
+            } else {
+                // 窄屏时滚动滑出面板目录
+                const $tocPanel = $('.toc-panel');
+                if ($tocPanel.length === 0) return;
+                
+                const panel = $tocPanel[0];
+                const item = $activeItem[0];
+                
+                const panelRect = panel.getBoundingClientRect();
+                const itemRect = item.getBoundingClientRect();
+                
+                const panelTop = panelRect.top;
+                const panelBottom = panelRect.bottom;
+                const panelHeight = panel.clientHeight;
+                const itemTop = itemRect.top;
+                const itemBottom = itemRect.bottom;
+                const itemHeight = $activeItem.outerHeight();
+                
+                const itemOffsetTop = item.offsetTop;
+                const currentScrollTop = panel.scrollTop;
+                
+                const topMargin = 80;
+                const bottomMargin = 30;
+                
+                let targetScrollTop = currentScrollTop;
+                
+                if (itemTop < panelTop + topMargin) {
+                    targetScrollTop = itemOffsetTop - topMargin;
+                }
+                else if (itemBottom > panelBottom - bottomMargin) {
+                    targetScrollTop = itemOffsetTop - panelHeight + itemHeight + bottomMargin;
+                }
+                
+                if (Math.abs(targetScrollTop - currentScrollTop) > 5) {
+                    panel.scrollTo({
+                        top: Math.max(0, targetScrollTop),
+                        behavior: 'smooth'
+                    });
                 }
             }
         }
 
-        // 打开/关闭TOC
+        // 打开/关闭TOC面板
         function toggleToc() {
-            $('.toc-panel').toggleClass('active');
-            $('.toc-overlay').toggleClass('active');
+            const $panel = $('.toc-panel');
+            const $overlay = $('.toc-overlay');
+            const isActive = $panel.hasClass('active');
+            
+            if (isActive) {
+                $panel.removeClass('active');
+                $overlay.removeClass('active');
+            } else {
+                $panel.addClass('active');
+                $overlay.addClass('active');
+            }
         }
 
-        $('.toc-minitool').click(toggleToc)
-        $('.toc-close').click(toggleToc);
-        $('.toc-overlay').click(toggleToc);
+        // 切换全部展开/折叠
+        function toggleAllToc() {
+            isAllExpanded = !isAllExpanded;
+            // 同时操作两个容器的目录项（窄屏面板和宽屏侧边栏）
+            $('.toc-item.has-children').toggleClass('collapsed', !isAllExpanded);
+            $('.toc-toggle-all-btn').toggleClass('expanded', isAllExpanded);
+        }
+
+        // 关闭TOC面板
+        function closeToc() {
+            $('.toc-panel').removeClass('active');
+            $('.toc-overlay').removeClass('active');
+        }
+
+        // 点击目录按钮打开面板
+        $('.toc-minitool').click(toggleToc);
+        // 点击关闭按钮
+        $(document).on('click', '.toc-panel .toc-close', closeToc);
+        // 点击遮罩关闭
+        $('.toc-overlay').click(function() {
+            $('.toc-panel').removeClass('active');
+            $('.toc-overlay').removeClass('active');
+        });
+        
+        // 全部展开/折叠按钮事件
+        $(document).on('click', '.toc-toggle-all-btn', toggleAllToc);
+        
+        // 窗口大小变化时重新初始化
+        let resizeTimeout;
+        $(window).on('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                initToc();
+            }, 100);
+        });
     </script>
 <?php endif; ?>
 <?php if ($this->options->elinkTargetBlankStatus == 'yes'): ?>
@@ -515,11 +718,89 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         }
     }
 
+    // 初始化文章标题折叠功能
+    function initHeadingCollapse() {
+        const $postContent = $('.post-content');
+        if ($postContent.length === 0) return;
+        
+        const $headings = $postContent.find('h1, h2, h3, h4, h5, h6');
+        if ($headings.length === 0) return;
+        
+        // 不同级别标题的颜色
+        const levelColors = {
+            1: '#3354AA', // H1 - 蓝色
+            2: '#2E7D32', // H2 - 绿色
+            3: '#F57C00', // H3 - 橙色
+            4: '#7B1FA2', // H4 - 紫色
+            5: '#C62828', // H5 - 红色
+            6: '#455A64'  // H6 - 蓝灰色
+        };
+        
+        $headings.each(function() {
+            const $heading = $(this);
+            // 避免重复添加折叠按钮
+            if ($heading.find('.heading-collapse-toggle').length > 0) return;
+            
+            const headingTag = $heading.prop('tagName');
+            const headingLevel = parseInt(headingTag.replace('H', ''));
+            const color = levelColors[headingLevel] || levelColors[3];
+            const titleText = `点击折叠/展开内容 (${headingTag})`;
+            
+            // 创建折叠按钮（竖线样式）
+            const $toggleBtn = $(`<span class="heading-collapse-toggle" title="${titleText}" style="background-color: ${color};" data-level="${headingLevel}"></span>`);
+            $heading.prepend($toggleBtn);
+            
+            // 绑定点击事件
+            $toggleBtn.on('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                const $currentHeading = $(this).parent();
+                const headingTag = $currentHeading.prop('tagName');
+                const headingLevel = parseInt(headingTag.replace('H', ''));
+                
+                // 收集该标题下的所有内容，直到下一个同级或更高级标题
+                const $contentWrapper = $currentHeading.next('.heading-content-wrapper');
+                
+                if ($contentWrapper.length > 0) {
+                    // 已有包装器，切换显示状态
+                    $contentWrapper.toggleClass('collapsed');
+                    $currentHeading.toggleClass('heading-collapsed');
+                } else {
+                    // 创建包装器并收集内容
+                    const $wrapper = $('<div class="heading-content-wrapper"></div>');
+                    let $nextElement = $currentHeading.next();
+                    
+                    while ($nextElement.length > 0) {
+                        const nextTag = $nextElement.prop('tagName');
+                        // 检查是否遇到同级或更高级标题
+                        if (/^H[1-6]$/.test(nextTag)) {
+                            const nextLevel = parseInt(nextTag.replace('H', ''));
+                            if (nextLevel <= headingLevel) {
+                                break;
+                            }
+                        }
+                        
+                        const $temp = $nextElement.next();
+                        $nextElement.appendTo($wrapper);
+                        $nextElement = $temp;
+                    }
+                    
+                    $currentHeading.after($wrapper);
+                    $wrapper.addClass('collapsed');
+                    $currentHeading.addClass('heading-collapsed');
+                }
+            });
+        });
+    }
+
     // 初始化main容器
     function initMain() {
         // 先初始化代码块复制按钮（包装pre元素）
         initMdCopyButton();
         initCodeCopyButton();
+        // 初始化标题折叠功能
+        initHeadingCollapse();
 
         // 代码高亮
         hljs.highlightAll();
@@ -611,10 +892,10 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
     }
 
     <?php if ($this->options->pjaxStatus == 'yes'): ?>
-    // PJAX实现
+    // PJAX实现 - 同时更新主内容和侧边栏
     $(document).pjax('a[href^="<?php $this->options->siteUrl(); ?>"]:not(a[target="_blank"], a[no-pjax])', {
-        container: '#main',
-        fragment: '#main',
+        container: '#pjax-container',
+        fragment: '#pjax-container',
         timeout: 7000
     }).on('pjax:send', function () {
         // 显示进度条
@@ -625,32 +906,32 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         const searchKeywords = $('#search #s');
         $.pjax({
             url: '<?php echo $this->options->siteUrl.($this->options->rewrite == 0 ? 'index.php/' : ''); ?>search/' + searchKeywords.val() + '/',
-            container: '#main',
-            fragment: '#main'
+            container: '#pjax-container',
+            fragment: '#pjax-container'
         });
         searchKeywords.val('');
     }).on('submit', 'form[id=comment-form]', function (event) {
         // 评论表单提交，替换为PJAX提交
         event.preventDefault();
         $.pjax.submit(event, {
-            container: '#main',
-            fragment: '#main'
+            container: '#pjax-container',
+            fragment: '#pjax-container'
         });
     }).on('pjax:beforeReplace', function (event) {
         if (event.state.url.endsWith('/comment')) {
             // 评论提交后，替换为PJAX跳转到评论页
             $.pjax({
                 url: /#(comments|comment-\d+)$/.test(event.previousState.url) ? event.previousState.url : event.previousState.url + '#comments',
-                container: '#main',
-                fragment: '#main'
+                container: '#pjax-container',
+                fragment: '#pjax-container'
             });
         }
     }).on('submit', 'form[class=protected]', function (event) {
         // 加密文章密码表单提交，替换为PJAX提交
         event.preventDefault();
         $.pjax.submit(event, {
-            container: '#main',
-            fragment: '#main'
+            container: '#pjax-container',
+            fragment: '#pjax-container'
         });
     }).on('pjax:complete', function (event, data, status, xhr, options) {
         if (event.relatedTarget) {
@@ -666,8 +947,8 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
                     alert(message);
                     $.pjax({
                         url: xhr.url.replace(/\/comment$/, '/#comments'),
-                        container: '#main',
-                        fragment: '#main'
+                        container: '#pjax-container',
+                        fragment: '#pjax-container'
                     });
                 }
             } else if (event.relatedTarget.tagName === 'FORM' && event.relatedTarget.classList.contains('protected')) {
@@ -699,6 +980,118 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
     // 非PJAX，直接初始化main容器
     initMain();
     <?php endif; ?>
+</script>
+<!-- 阅读进度条功能 -->
+<script>
+    function initReadingProgressBar() {
+        const progressBar = document.getElementById('readingProgressBar');
+        if (!progressBar) return;
+        
+        // 检查是否为文章详情页
+        const postContent = document.querySelector('.post-content');
+        if (!postContent) {
+            progressBar.classList.add('hidden');
+            return;
+        }
+        
+        progressBar.classList.remove('hidden');
+        
+        function updateProgress() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            
+            if (docHeight <= 0) {
+                progressBar.style.width = '100%';
+                return;
+            }
+            
+            const progress = (scrollTop / docHeight) * 100;
+            progressBar.style.width = progress + '%';
+        }
+        
+        // 使用节流函数优化性能
+        let ticking = false;
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    updateProgress();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+        
+        // 初始更新
+            updateProgress();
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initReadingProgressBar);
+        } else {
+            initReadingProgressBar();
+        }
+    </script>
+<!-- 快捷键支持 -->
+<script>
+    $(document).on('keydown', function(e) {
+        // 忽略在输入框中的按键
+        if ($(e.target).is('input, textarea, select')) {
+            return;
+        }
+        
+        // 按 / 聚焦搜索框
+        if (e.key === '/' || e.keyCode === 191) {
+            e.preventDefault();
+            const $searchInput = $('#s');
+            if ($searchInput.length) {
+                $searchInput.focus();
+            }
+            return;
+        }
+        
+        // 按 T 打开/关闭目录
+        if (e.key === 't' || e.key === 'T' || e.keyCode === 84) {
+            <?php if ($this->options->tocMinitoolStatus == 'yes'): ?>
+            if ($('.toc-minitool').is(':visible')) {
+                $('.toc-minitool').click();
+            }
+            <?php endif; ?>
+            return;
+        }
+        
+        // 按 Esc 关闭目录面板
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            <?php if ($this->options->tocMinitoolStatus == 'yes'): ?>
+            if ($('.toc-panel').hasClass('active')) {
+                $('.toc-panel').removeClass('active');
+                $('.toc-overlay').removeClass('active');
+            }
+            <?php endif; ?>
+            return;
+        }
+        
+        // 按 M 切换主题模式
+        if (e.key === 'm' || e.key === 'M' || e.keyCode === 77) {
+            <?php if ($this->options->themeModeMinitoolStatus == 'yes'): ?>
+            if ($('.themeMode-minitool').length) {
+                $('.themeMode-minitool').click();
+            }
+            <?php endif; ?>
+            return;
+        }
+        
+        // 按 G 返回顶部
+        if (e.key === 'g' || e.key === 'G' || e.keyCode === 71) {
+            <?php if ($this->options->topMinitoolStatus == 'yes'): ?>
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            <?php endif; ?>
+            return;
+        }
+    });
 </script>
 <?php if ($this->options->topMinitoolStatus == 'yes'): ?>
     <!-- 返回顶部 -->
