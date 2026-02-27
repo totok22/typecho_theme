@@ -8,7 +8,7 @@ $this->need('header.php');
 <div class="col-sm-12 <?php if ($this->options->sidebarStatus == 'yes'): ?>col-md-8<?php endif; ?>" id="main">
     <?php
     // 如果文章属于私有分类，且用户未登录，则显示提示信息
-    if (isPostPrivate($this) && !isUserLoggedIn()):
+    if (isPostPrivate($this) && !$this->user->hasLogin()):
     ?>
         <article class="post">
             <h1 class="post-title"><?php $this->title(); ?></h1>
@@ -18,7 +18,7 @@ $this->need('header.php');
             </div>
         </article>
     <?php else: ?>
-        <?php if (isUserLoggedIn()): ?>
+        <?php if ($this->user->hasLogin()): ?>
         <?php
         // 获取 Markdown 原文
         $markdownContent = '';
@@ -34,7 +34,7 @@ $this->need('header.php');
         <?php endif; ?>
         <article class="post">
             <h1 class="post-title"><?php $this->title(); ?>
-            <?php if (isUserLoggedIn()): ?>
+            <?php if ($this->user->hasLogin()): ?>
             <button class="md-copy-btn" id="mdCopyBtn" title="复制 Markdown 原文">
                 <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -101,7 +101,7 @@ $this->need('header.php');
                         <?php $this->widget('Widget_Metas_Category_List')->to($categoryList); ?>
                         <?php while ($categoryList->next()): ?>
                             <?php
-                            if (isPrivateCategory($categoryList->mid) && !isUserLoggedIn()) {
+                            if (isPrivateCategory($categoryList->mid) && !$this->user->hasLogin()) {
                                 continue;
                             }
                             ?>
@@ -117,7 +117,7 @@ $this->need('header.php');
                     <ul class="widget-list">
                         <?php while ($tags->next()): ?>
                             <?php
-                            if (isTagPrivateOnly($tags->mid) && !isUserLoggedIn()) {
+                            if (isTagPrivateOnly($tags->mid) && !$this->user->hasLogin()) {
                                 continue;
                             }
                             ?>

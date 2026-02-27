@@ -24,7 +24,7 @@ $isPostPage = $this->is('post') || $this->is('page');
                 <?php while ($categoryList->next()): ?>
                     <?php
                     // 如果是私有分类或其子分类，且用户未登录，则跳过
-                    if (isPrivateCategory($categoryList->mid) && !isUserLoggedIn()) {
+                    if (isPrivateCategory($categoryList->mid) && !$this->user->hasLogin()) {
                         continue;
                     }
                     ?>
@@ -41,7 +41,7 @@ $isPostPage = $this->is('post') || $this->is('page');
                 <?php while ($tags->next()): ?>
                     <?php
                     // 如果标签只包含私有文章，且用户未登录，则跳过
-                    if (isTagPrivateOnly($tags->mid) && !isUserLoggedIn()) {
+                    if (isTagPrivateOnly($tags->mid) && !$this->user->hasLogin()) {
                         continue;
                     }
                     ?>

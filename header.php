@@ -103,7 +103,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
                         <?php while ($categories->next()): ?>
                             <?php
                             // 如果是私有分类或其子分类，且用户未登录，则跳过
-                            if (isPrivateCategory($categories->mid) && !isUserLoggedIn()) {
+                            if (isPrivateCategory($categories->mid) && !$this->user->hasLogin()) {
                                 continue;
                             }
                             ?>

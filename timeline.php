@@ -19,8 +19,7 @@ $this->need('header.php');
                         ->where('status = ?', 'publish');
                 
                 // 如果用户未登录，过滤私有分类的文章
-                $user = Typecho_Widget::widget('Widget_User');
-                if (!$user->hasLogin()) {
+                if (!$this->user->hasLogin()) {
                     $privatePostIds = getPrivatePostIds();
                     if (!empty($privatePostIds)) {
                         $select->where('table.contents.cid NOT IN ?', $privatePostIds);

@@ -3,7 +3,7 @@
  * default-ultra theme for Typecho
  *
  * @package default-ultra
- * @version 2.8.1
+ * @version 2.8.2
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');
@@ -12,7 +12,7 @@ $this->need('header.php');
     <?php while ($this->next()): ?>
         <?php
         // 如果文章属于私有分类，且用户未登录，则跳过
-        if (isPostPrivate($this) && !isUserLoggedIn()) {
+        if (isPostPrivate($this) && !$this->user->hasLogin()) {
             continue;
         }
         ?>
