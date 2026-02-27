@@ -3,7 +3,7 @@
  * default-ultra theme for Typecho
  *
  * @package default-ultra
- * @version 2.8
+ * @version 2.8.1
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');

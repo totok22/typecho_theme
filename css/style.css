@@ -82,19 +82,18 @@ pre {
     max-height: 400px
 }
 
-/* 行内代码样式 - 只应用于不在pre内的code */
-.post-content > *:not(pre) code,
-.post-content p code,
-.post-content li code,
-.post-content td code,
-.post-content th code,
-.post-content blockquote code,
-.post-content h1 code,
-.post-content h2 code,
-.post-content h3 code,
-.post-content h4 code,
-.post-content h5 code,
-.post-content h6 code {
+/* 行内代码样式（显式列举，避免误伤 .code-block-wrapper 内代码块） */
+.post-content p > code,
+.post-content li > code,
+.post-content td > code,
+.post-content th > code,
+.post-content blockquote > code,
+.post-content h1 > code,
+.post-content h2 > code,
+.post-content h3 > code,
+.post-content h4 > code,
+.post-content h5 > code,
+.post-content h6 > code {
     font-family: var(--code-font-famliy);
     font-size: .92857em;
     padding: 2px 6px;
@@ -103,51 +102,57 @@ pre {
     border-radius: 3px
 }
 
-[theme-mode="dark"] .post-content > *:not(pre) code,
-[theme-mode="dark"] .post-content p code,
-[theme-mode="dark"] .post-content li code,
-[theme-mode="dark"] .post-content td code,
-[theme-mode="dark"] .post-content th code,
-[theme-mode="dark"] .post-content blockquote code,
-[theme-mode="dark"] .post-content h1 code,
-[theme-mode="dark"] .post-content h2 code,
-[theme-mode="dark"] .post-content h3 code,
-[theme-mode="dark"] .post-content h4 code,
-[theme-mode="dark"] .post-content h5 code,
-[theme-mode="dark"] .post-content h6 code {
+[theme-mode="dark"] .post-content p > code,
+[theme-mode="dark"] .post-content li > code,
+[theme-mode="dark"] .post-content td > code,
+[theme-mode="dark"] .post-content th > code,
+[theme-mode="dark"] .post-content blockquote > code,
+[theme-mode="dark"] .post-content h1 > code,
+[theme-mode="dark"] .post-content h2 > code,
+[theme-mode="dark"] .post-content h3 > code,
+[theme-mode="dark"] .post-content h4 > code,
+[theme-mode="dark"] .post-content h5 > code,
+[theme-mode="dark"] .post-content h6 > code {
     color: #E8A0A8;
-    background-color: #3D2F32
+    background-color: #282C34
 }
 
-[theme-mode="read"] .post-content > *:not(pre) code,
-[theme-mode="read"] .post-content p code,
-[theme-mode="read"] .post-content li code,
-[theme-mode="read"] .post-content td code,
-[theme-mode="read"] .post-content th code,
-[theme-mode="read"] .post-content blockquote code,
-[theme-mode="read"] .post-content h1 code,
-[theme-mode="read"] .post-content h2 code,
-[theme-mode="read"] .post-content h3 code,
-[theme-mode="read"] .post-content h4 code,
-[theme-mode="read"] .post-content h5 code,
-[theme-mode="read"] .post-content h6 code {
+[theme-mode="read"] .post-content p > code,
+[theme-mode="read"] .post-content li > code,
+[theme-mode="read"] .post-content td > code,
+[theme-mode="read"] .post-content th > code,
+[theme-mode="read"] .post-content blockquote > code,
+[theme-mode="read"] .post-content h1 > code,
+[theme-mode="read"] .post-content h2 > code,
+[theme-mode="read"] .post-content h3 > code,
+[theme-mode="read"] .post-content h4 > code,
+[theme-mode="read"] .post-content h5 > code,
+[theme-mode="read"] .post-content h6 > code {
     color: #8B5A5A;
     background-color: #E8E2D8
 }
 
-/* 代码块内的code元素 - 重置行内代码样式 */
-pre code {
+/* 代码块内的code元素 - 强制重置行内代码样式 */
+.post-content pre code {
     font-family: var(--code-font-famliy);
     font-size: inherit;
     padding: 0;
-    background-color: transparent;
-    color: inherit;
-    border-radius: 0
+    background-color: transparent !important;
+    color: inherit !important;
+    border-radius: 0;
+    white-space: pre;
+    word-break: normal;
+    overflow-wrap: normal
 }
 
-code.language-plaintext {
-    text-wrap: initial;
-    font-family: var(--body-font-famliy)
+/* 纯文本代码块也使用等宽字体，避免回退为正文字体 */
+.post-content pre code.language-plaintext {
+    font-family: var(--code-font-famliy);
+    background-color: transparent !important;
+    color: inherit !important;
+    white-space: pre;
+    word-break: normal;
+    overflow-wrap: normal
 }
 
 blockquote {
@@ -547,7 +552,10 @@ button:hover,input[type=submit]:hover {
 
 .post-content pre {
     margin-bottom: 1em;
-    margin-top: -0.2em
+    margin-top: -0.2em;
+    white-space: pre;
+    word-break: normal;
+    overflow-wrap: normal
 }
 
 .post-near {
@@ -1341,25 +1349,29 @@ pre code.hljs {
     overflow-x: visible!important
 }
 
-pre {
-    background-color: #FAFAFA
+/* 强制 fenced code block（```）使用独立配色，避免被行内 code 覆盖 */
+.post-content pre,
+.post-content pre code,
+.post-content pre code.hljs,
+.post-content pre.hljs {
+    background-color: #FAFAFA !important;
+    color: #383A42 !important
 }
 
-[theme-mode="dark"] pre {
-    background-color: #282C34
+[theme-mode="dark"] .post-content pre,
+[theme-mode="dark"] .post-content pre code,
+[theme-mode="dark"] .post-content pre code.hljs,
+[theme-mode="dark"] .post-content pre.hljs {
+    background-color: #282C34 !important;
+    color: #ABB2BF !important
 }
 
-[theme-mode="dark"] .hljs {
-    color: #ABB2BF;
-    background-color: #282C34
-}
-
-[theme-mode="read"] pre {
-    background-color: var(--muted-color)
-}
-
-[theme-mode="read"] .hljs {
-    background-color: var(--muted-color)
+[theme-mode="read"] .post-content pre,
+[theme-mode="read"] .post-content pre code,
+[theme-mode="read"] .post-content pre code.hljs,
+[theme-mode="read"] .post-content pre.hljs {
+    background-color: #F4F1E8 !important;
+    color: #5B5247 !important
 }
 
 /* ------------------
