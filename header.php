@@ -3,9 +3,6 @@
  * 导航区
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
-if ($this->user->hasLogin()) {
-    header('Cache-Control: private, no-store');
-}
 ?>
 <!doctype html>
 <html lang="zh-CN">
