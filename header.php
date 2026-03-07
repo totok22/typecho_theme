@@ -78,7 +78,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         <div class="row">
             <div class="site-name col-md-6 col-sm-12">
                 <a id="logo" href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>
-                <p class="description"><?php $this->options->description(); ?></p>
+                <p class="description"><?php echo renderSiteDescription($this->options->description); ?></p>
             </div>
             <div class="site-helper col-md-6 col-sm-12">
                 <form id="search" method="post" action="<?php $this->options->siteUrl(); ?>">

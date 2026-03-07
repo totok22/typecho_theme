@@ -696,6 +696,99 @@ function getPrivatePostIds() {
 }
 
 /**
+ * 首页文章列表（查询阶段过滤私有分类）
+ */
+class Widget_Post_Index_Filtered extends Widget_Abstract_Contents {
+    private $total = 0;
+    private $currentPage = 1;
+    
+    public function __construct($request, $response, $params = null) {
+        parent::__construct($request, $response, $params);
+        $this->parameter->setDefault(array('pageSize' => $this->options->pageSize));
+    }
+    
+    public function execute() {
+        $this->currentPage = max(1, (int) $this->request->get('page', 1));
+        
+        $select = $this->select()->from('table.contents')
+            ->where('table.contents.password IS NULL OR table.contents.password = \'\'')
+            ->where('table.contents.status = ?', 'publish')
+            ->where('table.contents.created <= ?', $this->options->time)
+            ->where('table.contents.type = ?', 'post');
+        
+        $user = Typecho_Widget::widget('Widget_User');
+        if (!$user->hasLogin()) {
+            $privatePostIds = getPrivatePostIds();
+            if (!empty($privatePostIds)) {
+                $select->where('table.contents.cid NOT IN ?', $privatePostIds);
+            }
+        }
+        
+        $countSelect = clone $select;
+        $this->total = (int) $this->db->fetchObject(
+            $countSelect->cleanAttribute('fields')
+                ->select(array('COUNT(*)' => 'num'))
+                ->cleanAttribute('order')
+                ->cleanAttribute('limit')
+                ->cleanAttribute('offset')
+        )->num;
+        
+        $select->order('table.contents.created', Typecho_Db::SORT_DESC)
+            ->page($this->currentPage, $this->parameter->pageSize);
+        
+        $this->db->fetchAll($select, array($this, 'push'));
+    }
+    
+    public function getTotal() {
+        return $this->total;
+    }
+    
+    public function getCurrentPage() {
+        return $this->currentPage;
+    }
+    
+    public function pageNav($prev = '&laquo; 前一页', $next = '后一页 &raquo;', $splitPage = 3, $splitWord = '...', $template = '') {
+        if (!$this->have()) {
+            return;
+        }
+        
+        $pageSize = (int) $this->parameter->pageSize;
+        if ($this->total <= $pageSize) {
+            return;
+        }
+        
+        $default = array(
+            'wrapTag'   => 'ol',
+            'wrapClass' => 'page-navigator'
+        );
+        
+        if (is_string($template)) {
+            parse_str($template, $config);
+        } else {
+            $config = $template ?: array();
+        }
+        
+        $template = array_merge($default, $config);
+        $query = \Typecho\Router::url('index_page', new class implements \Typecho\Router\ParamsDelegateInterface {
+            public function getRouterParam(string $key): string {
+                return '{' . $key . '}';
+            }
+        }, Helper::options()->index);
+        
+        $nav = new \Typecho\Widget\Helper\PageNavigator\Box(
+            $this->total,
+            $this->currentPage,
+            $pageSize,
+            $query
+        );
+        
+        echo '<' . $template['wrapTag'] . (empty($template['wrapClass']) ? '' : ' class="' . $template['wrapClass'] . '"') . '>';
+        $nav->render($prev, $next, $splitPage, $splitWord, $template);
+        echo '</' . $template['wrapTag'] . '>';
+    }
+}
+
+/**
  * 生成随机推荐文章
  */
 class Widget_Post_rand extends Widget_Abstract_Contents {
@@ -791,6 +884,55 @@ function parseContent($content) {
     $content = preg_replace($imagePattern, $imageReplacement, $content);
     
     return $content;
+}
+
+/**
+ * 将 Markdown 文本渲染为 HTML
+ * @param string|null $text
+ * @return string
+ */
+function renderMarkdownText($text) {
+    if ($text === null) {
+        return '';
+    }
+    
+    $text = trim((string) $text);
+    if ($text === '') {
+        return '';
+    }
+    
+    $text = str_replace("\r\n", "\n", $text);
+    
+    if (strpos($text, '<!--markdown-->') !== 0) {
+        $text = '<!--markdown-->' . $text;
+    }
+    
+    $html = $text;
+    if (class_exists('\\Utils\\Markdown')) {
+        $html = \Utils\Markdown::convert(substr($text, 15));
+    } else {
+        $html = nl2br(htmlspecialchars(substr($text, 15), ENT_QUOTES, 'UTF-8'));
+    }
+    
+    return parseContent($html);
+}
+
+/**
+ * 渲染文章的 description 自定义字段
+ * @param Widget_Archive $archive 文章对象
+ * @return string
+ */
+function renderPostDescription($archive) {
+    return renderMarkdownText(getPostDescription($archive));
+}
+
+/**
+ * 渲染站点 description
+ * @param mixed $description
+ * @return string
+ */
+function renderSiteDescription($description) {
+    return renderMarkdownText($description);
 }
 
 /**

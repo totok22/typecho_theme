@@ -14,12 +14,13 @@ $this->need('header.php');
                 'archive'   => '%s 发布的文章archive'
         ], '', ''); ?></h3>
     <?php if ($this->have()): ?>
+        <?php $hasVisiblePosts = false; ?>
         <?php while ($this->next()): ?>
             <?php
-            // 如果文章属于私有分类，且用户未登录，则跳过
             if (isPostPrivate($this) && !$this->user->hasLogin()) {
                 continue;
             }
+            $hasVisiblePosts = true;
             ?>
             <article class="post">
                 <h2 class="post-title">
@@ -49,10 +50,9 @@ $this->need('header.php');
                 </ul>
                 <div class="post-summary">
                     <?php
-                    // 优先显示自定义description字段，没有则显示文章摘要
                     $description = getPostDescription($this);
                     if ($description) {
-                        echo $description;
+                        echo renderPostDescription($this);
                     } else {
                         $this->excerpt(500, '');
                     }
@@ -60,6 +60,11 @@ $this->need('header.php');
                 </div>
             </article>
         <?php endwhile; ?>
+        <?php if (!$hasVisiblePosts): ?>
+            <article class="post">
+                <h3>没有找到可显示的文章</h3>
+            </article>
+        <?php endif; ?>
     <?php else: ?>
         <article class="post">
             <h3>没有找到内容</h3>

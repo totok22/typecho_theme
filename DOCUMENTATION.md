@@ -212,32 +212,36 @@ class Widget_Post_rand extends Widget_Abstract_Contents
 - MySQL/MariaDB: 使用 `RAND()` 函数
 - PostgreSQL/SQLite: 使用 `RANDOM()` 函数
 
-#### 3.1.7 文章内容解析 [`parseContent()`](functions.php:640)
+#### 3.1.7 首页过滤与 description 渲染
+
+- [`Widget_Post_Index_Filtered`](functions.php) 在查询阶段过滤未登录用户不可见的私有分类文章，避免首页分页取到的整页文章都在模板中被 `continue` 跳过，导致访客首页空白。
+- [`renderMarkdownText()`](functions.php) 负责将 Markdown 文本转成 HTML，并复用 [`parseContent()`](functions.php) 继续处理图片懒加载、灯箱与防盗链。
+- [`renderPostDescription()`](functions.php) 用于渲染文章自定义字段 `description`。
+- [`renderSiteDescription()`](functions.php) 用于渲染站点描述。
+
+#### 3.1.8 文章内容解析 [`parseContent()`](functions.php:770)
 
 ```php
 function parseContent($content)
 ```
 
-**功能说明：** 处理文章内容中的图片标签。
+**功能说明：** 处理 HTML 内容中的图片标签。
 
 **处理逻辑：**
 1. **图片懒加载**：将 `src` 替换为默认占位图，真实 URL 放入 `data-original`
 2. **防盗链处理**：通过 weserv 服务代理外链图片
 3. **灯箱效果**：用 `<a>` 标签包裹图片，添加 `data-fancybox` 属性
 
-**输出示例：**
-```html
-<!-- 开启所有功能 -->
-<a href="https://example.com/image.jpg" data-fancybox="gallery">
-    <img src="data:image/png;base64,..." data-original="https://static-lab.6os.net/weserv/?url=https://example.com/image.jpg" class="lazyload">
-</a>
-```
+**典型使用场景：**
+- 文章正文渲染后处理
+- 自定义 `description` Markdown 转 HTML 后的图片处理
+- 站点描述 Markdown 转 HTML 后的图片处理
 
 ---
 
 ### 3.2 header.php - 页面头部
 
-[`header.php`](header.php) 定义了网站的头部区域，包括 HTML 元信息、导航栏和主题模式初始化。
+[`header.php`](header.php) 定义了网站的头部区域，包括 HTML 元信息、导航栏、站点描述渲染和主题模式初始化。
 
 #### 3.2.1 文件结构
 
@@ -281,6 +285,14 @@ function parseContent($content)
     document.body.setAttribute('theme-mode', mode);
 })();
 ```
+
+**站点描述渲染：**
+```php
+<p class="description"><?php echo renderSiteDescription($this->options->description); ?></p>
+```
+
+- 支持在后台站点描述中直接编写 Markdown
+- 渲染完成后继续复用主题图片处理链路
 
 **导航菜单：**
 ```php
@@ -358,27 +370,36 @@ $(document).pjax('a[href^="..."]:not(a[target="_blank"], a[no-pjax])', {
 
 ### 3.4 index.php - 首页模板
 
-[`index.php`](index.php) 是主题入口文件，展示文章列表。
+[`index.php`](index.php) 是主题入口文件，展示首页文章列表。
 
-#### 3.4.1 文章循环
+#### 3.4.1 首页文章查询
 
 ```php
-<?php while ($this->next()): ?>
-    <article class="post">
-        <h2 class="post-title">
-            <a href="<?php $this->permalink(); ?>"><?php $this->title(); ?></a>
-        </h2>
-        <ul class="post-meta">
-            <!-- 日期、分类、标签、阅读数、评论数、字数、阅读时长 -->
-        </ul>
-        <div class="post-summary">
-            <?php $this->excerpt(500, ''); ?>
-        </div>
-    </article>
-<?php endwhile; ?>
+<?php $this->widget('Widget_Post_Index_Filtered@index', 'pageSize=' . $this->options->pageSize)->to($indexPosts); ?>
 ```
 
-#### 3.4.2 布局控制
+**说明：**
+- 首页不再直接使用当前归档对象循环输出
+- 改为通过 [`Widget_Post_Index_Filtered`](functions.php) 在查询阶段过滤私有分类文章
+- 这样可避免未登录用户遇到“本页取出的文章全部被模板跳过”导致的空白首页问题
+
+#### 3.4.2 列表摘要策略
+
+```php
+$description = getPostDescription($indexPosts);
+if ($description) {
+    echo renderPostDescription($indexPosts);
+} else {
+    $indexPosts->excerpt(500, '');
+}
+```
+
+**说明：**
+- 优先显示文章自定义字段 `description`
+- `description` 支持 Markdown 渲染
+- 若未配置 `description`，则退回使用原生摘要
+
+#### 3.4.3 布局控制
 
 ```php
 <div class="col-sm-12 <?php if ($this->options->sidebarStatus == 'yes'): ?>col-md-8<?php endif; ?>" id="main">
@@ -396,12 +417,23 @@ $(document).pjax('a[href^="..."]:not(a[target="_blank"], a[no-pjax])', {
 #### 3.5.1 与首页的区别
 
 - 标题使用 `<h1>` 而非 `<h2>`
-- 显示完整内容（通过 [`parseContent()`](functions.php:640) 处理）
+- 显示完整内容（通过 [`parseContent()`](functions.php:770) 处理）
+- 支持单篇文章自定义 `description` 的 Markdown 渲染
 - 显示文章声明（如果启用）
 - 显示上一篇/下一篇导航
 - 加载评论区
 
-#### 3.5.2 文章声明
+#### 3.5.2 description 渲染
+
+```php
+<?php echo renderPostDescription($this); ?>
+```
+
+**说明：**
+- 单篇文章页顶部描述区支持 Markdown
+- 渲染后同样会复用主题图片处理逻辑
+
+#### 3.5.3 文章声明
 
 ```php
 <?php if ($this->options->statementStatus == 'yes'): ?>
@@ -433,6 +465,8 @@ $(document).pjax('a[href^="..."]:not(a[target="_blank"], a[no-pjax])', {
 
 [`archive.php`](archive.php) 用于展示分类、标签、搜索结果等归档页面。
 
+归档页仍使用原始归档查询结果，但在模板层对私有分类文章进行访客过滤；若当前页文章都被过滤，会显示“没有找到可显示的文章”的提示，而不是直接输出空白区域。
+
 #### 3.7.1 归档标题
 
 ```php
@@ -446,14 +480,21 @@ $(document).pjax('a[href^="..."]:not(a[target="_blank"], a[no-pjax])', {
 </h3>
 ```
 
-#### 3.7.2 空结果处理
+#### 3.7.2 摘要与空结果处理
 
 ```php
-<?php if ($this->have()): ?>
-    // 显示文章列表
-<?php else: ?>
+$description = getPostDescription($this);
+if ($description) {
+    echo renderPostDescription($this);
+} else {
+    $this->excerpt(500, '');
+}
+```
+
+```php
+<?php if (!$hasVisiblePosts): ?>
     <article class="post">
-        <h3>没有找到内容</h3>
+        <h3>没有找到可显示的文章</h3>
     </article>
 <?php endif; ?>
 ```
@@ -795,6 +836,8 @@ $('.themeMode-minitool').click(function() {
 | `sidebarStickyStatus` | radio | no | 粘性布局开关 |
 
 ### 6.4 文章设置
+
+其中“内部文章分类名称”会影响访客可见范围：配置中的分类及其全部子分类文章，会在未登录状态下被视为内部文章。
 
 | 选项 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|

@@ -67,12 +67,11 @@ $this->need('header.php');
                 <?php endif; ?>
             </ul>
             <?php
-            // 显示自定义description字段
             $description = getPostDescription($this);
             if ($description):
             ?>
                 <div class="post-description" style="margin-top: 1em; padding: 1em; background-color: var(--muted-color); border-left: 4px solid var(--border-color); color: var(--secondary-color);">
-                    <?php echo $description; ?>
+                    <?php echo renderPostDescription($this); ?>
                 </div>
             <?php endif; ?>
             <div class="post-content" style="margin-top: 2em">
