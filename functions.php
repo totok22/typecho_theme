@@ -6,6 +6,14 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
 error_reporting(0);
 
+// 已登录用户发送不缓存头，防止CDN缓存登录版本页面
+foreach ($_COOKIE as $k => $v) {
+    if (strpos($k, '__typecho_uid') !== false) {
+        header('Cache-Control: no-cache, no-store, private');
+        break;
+    }
+}
+
 /**
  * 主题配置项
  */

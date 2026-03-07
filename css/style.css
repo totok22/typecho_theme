@@ -420,17 +420,15 @@ button:hover,input[type=submit]:hover {
     border-bottom: 2px solid var(--border-color);
     margin-bottom: 0.8em;
     position: relative;
-    padding-left: 0.8em;
+    gap: 0.5em;
     margin-left: 0
 }
 
 .post-content h1::before {
     content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
     width: 4px;
+    align-self: stretch;
+    flex-shrink: 0;
     background-color: var(--link-color);
     border-radius: 2px
 }
