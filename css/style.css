@@ -416,21 +416,27 @@ button:hover,input[type=submit]:hover {
     padding-top: 2em;
     padding-bottom: 1.2em;
     font-weight: 700;
+    line-height: 1.4;
     color: var(--text-color);
     border-bottom: 2px solid var(--border-color);
     margin-bottom: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     position: relative;
-    gap: 0.5em;
     margin-left: 0
 }
 
 .post-content h1::before {
     content: '';
+    display: inline-block;
     width: 4px;
-    align-self: stretch;
-    flex-shrink: 0;
+    height: 1.1em;
     background-color: var(--link-color);
-    border-radius: 2px
+    border-radius: 2px;
+    flex-shrink: 0;
+    position: relative;
+    top: 0.02em
 }
 
 .post-content h2 {
@@ -1546,7 +1552,7 @@ pre code.hljs {
 .post-content .heading-collapse-toggle {
     display: inline-block;
     width: 4px;
-    height: 1.2em;
+    height: 1.1em;
     margin-right: 12px;
     margin-left: 4px;
     cursor: pointer;
@@ -1562,7 +1568,7 @@ pre code.hljs {
 }
 
 .post-content h2 .heading-collapse-toggle {
-    height: 1.25em;
+    height: 1.1em;
 }
 
 .post-content h3 .heading-collapse-toggle {
@@ -1610,8 +1616,7 @@ pre code.hljs {
 
 /* 确保h1标题的竖条与文字垂直居中对齐 */
 .post-content h1 {
-    display: flex;
-    align-items: baseline;
+    align-items: center;
 }
 
 /* 暗色模式适配 */

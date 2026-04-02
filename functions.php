@@ -870,14 +870,14 @@ function parseContent($content) {
     
     if ($options->imageLazyloadStatus == 'yes') {
         // 开启图片懒加载
-        $imageReplacement = '<img src="'.$defaultImageUrl.'" data-original="'.$actualImageUrl.'" class="lazyload">';
+        $imageReplacement = '<img src="'.$defaultImageUrl.'" data-original="'.$actualImageUrl.'" alt="$2" class="lazyload">';
     } else {
-        $imageReplacement = '<img src="'.$actualImageUrl.'">';
+        $imageReplacement = '<img src="'.$actualImageUrl.'" alt="$2">';
     }
     
     if ($options->imageLightBoxStatus == 'yes') {
         // 开启图片灯箱
-        $imageReplacement = '<a href="'.$actualImageUrl.'" data-fancybox="gallery"/>'.$imageReplacement.'</a>';
+        $imageReplacement = '<a href="'.$actualImageUrl.'" data-fancybox="gallery">'.$imageReplacement.'</a>';
     }
     
     // 文章内容处理

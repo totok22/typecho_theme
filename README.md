@@ -3,6 +3,8 @@
 > [!NOTE]
 > 本仓库是 [typecho-default-ultra-theme](https://github.com/visduo/typecho-default-ultra-theme) 的 Fork 版本，基于原版主题进行一些改造。
 
+位于服务器目录：`/opt/1panel/apps/openresty/openresty/www/sites/62.234.56.174/index/usr/themes/default-ultra/`
+
 网站：[https://p0li.space/](https://p0li.space/)
 
 ## 链接

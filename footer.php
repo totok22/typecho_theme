@@ -745,6 +745,8 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
             const headingLevel = parseInt(headingTag.replace('H', ''));
             const color = levelColors[headingLevel] || levelColors[3];
             const titleText = `点击折叠/展开内容 (${headingTag})`;
+
+            if (headingLevel === 1) return;
             
             // 创建折叠按钮（竖线样式）
             const $toggleBtn = $(`<span class="heading-collapse-toggle" title="${titleText}" style="background-color: ${color};" data-level="${headingLevel}"></span>`);
