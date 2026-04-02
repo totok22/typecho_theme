@@ -11,6 +11,9 @@ $this->need('header.php');
     <article class="post">
         <h1 class="post-title"><?php $this->title(); ?></h1>
         <div class="post-content" style="margin-top: 2em">
+            <?php if (trim((string) $this->content) !== ''): ?>
+                <?php echo parseContent($this->content); ?>
+            <?php endif; ?>
             <div class="timeline">
                 <?php
                 $db = Typecho_Db::get();

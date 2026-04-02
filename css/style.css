@@ -1578,6 +1578,7 @@ pre code.hljs {
     transition: all 0.2s ease;
     vertical-align: middle;
     position: relative;
+    top: 0.02em;
     flex-shrink: 0;
 }
 
