@@ -577,13 +577,77 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         });
     </script>
 <?php endif; ?>
+<script>
+    function getAnchorRawHref(anchor) {
+        if (!anchor) {
+            return '';
+        }
+
+        const href = anchor.getAttribute('href');
+        return href ? href.trim() : '';
+    }
+
+    function resolveAnchorUrl(anchor) {
+        const rawHref = getAnchorRawHref(anchor);
+
+        if (rawHref === '') {
+            return null;
+        }
+
+        try {
+            return new URL(rawHref, window.location.href);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function isIgnoredAnchorHref(rawHref) {
+        return rawHref === '' || rawHref.startsWith('#') || /^(mailto:|tel:|javascript:)/i.test(rawHref);
+    }
+
+    function isInternalAnchor(anchor) {
+        const rawHref = getAnchorRawHref(anchor);
+
+        if (isIgnoredAnchorHref(rawHref)) {
+            return false;
+        }
+
+        const resolvedUrl = resolveAnchorUrl(anchor);
+        return resolvedUrl !== null && resolvedUrl.origin === window.location.origin;
+    }
+
+    function isSamePageAnchor(anchor) {
+        const resolvedUrl = resolveAnchorUrl(anchor);
+
+        if (resolvedUrl === null || resolvedUrl.hash === '') {
+            return false;
+        }
+
+        return resolvedUrl.origin === window.location.origin
+            && resolvedUrl.pathname === window.location.pathname
+            && resolvedUrl.search === window.location.search;
+    }
+
+    function shouldHandleWithPjax(anchor, event) {
+        if (!isInternalAnchor(anchor) || isSamePageAnchor(anchor) || anchor.hasAttribute('download')) {
+            return false;
+        }
+
+        if (!event) {
+            return true;
+        }
+
+        return !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.which <= 1;
+    }
+</script>
 <?php if ($this->options->elinkTargetBlankStatus == 'yes'): ?>
     <!-- 外链处理 -->
     <script>
         function initElink() {
             $('.post-content a').each(function () {
-                // 排除内链
-                if (this.href.includes('<?php $this->options->siteUrl(); ?>')) {
+                const rawHref = getAnchorRawHref(this);
+
+                if (isIgnoredAnchorHref(rawHref) || isInternalAnchor(this)) {
                     return;
                 }
 
@@ -594,7 +658,15 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
                 // 添加target属性
                 $(this).attr('target', '_blank');
-                $(this).attr('rel', 'external nofollow');
+                const relValues = (($(this).attr('rel') || '').split(/\s+/).filter(Boolean));
+
+                ['external', 'nofollow'].forEach(function (value) {
+                    if (!relValues.includes(value)) {
+                        relValues.push(value);
+                    }
+                });
+
+                $(this).attr('rel', relValues.join(' '));
             })
         }
     </script>
@@ -901,10 +973,16 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
     <?php if ($this->options->pjaxStatus == 'yes'): ?>
     // PJAX实现 - 同时更新主内容和侧边栏
-    $(document).pjax('a[href^="<?php $this->options->siteUrl(); ?>"]:not(a[target="_blank"], a[no-pjax])', {
-        container: '#pjax-container',
-        fragment: '#pjax-container',
-        timeout: 7000
+    $(document).on('click', 'a:not([target="_blank"]):not([no-pjax])', function (event) {
+        if (!shouldHandleWithPjax(this, event)) {
+            return;
+        }
+
+        $.pjax.click(event, {
+            container: '#pjax-container',
+            fragment: '#pjax-container',
+            timeout: 7000
+        });
     }).on('pjax:send', function () {
         // 显示进度条
         NProgress.start();
