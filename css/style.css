@@ -5,6 +5,24 @@
 @import url("//static-lab.6os.net/noto-color-emoji/1/result.css");
 @import url('https://npm.elemecdn.com/lxgw-wenkai-screen-webfont/style.css');
 
+@font-face {
+    font-family: "Theme Latin Serif";
+    src: url("https://static-lab.6os.net/DreamHanSerifCN/3.02/W8/8b5bb932b3ea1f888ace0d9e6991bee4.woff2") format("woff2");
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    unicode-range: U+0000, U+0020-007E, U+00A1-024F, U+1E00-1EFF, U+2012, U+2014, U+201A, U+201E, U+2039-203A;
+}
+
+@font-face {
+    font-family: "Theme Latin Serif";
+    src: url("https://static-lab.6os.net/DreamHanSerifCN/3.02/W8/d7498629b48735aff30dd9e489558df4.woff2") format("woff2");
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    unicode-range: U+2013, U+2018-2019, U+201C-201D, U+2022, U+2026-2027, U+203C, U+2047;
+}
+
 /* ------------------
  * 阅读进度条样式
  * --------------- */
@@ -30,7 +48,7 @@
     --secondary-color: #999999;
     --border-color: #EEEEEE;
     --muted-color: #F5F5F5;
-    --body-font-famliy: "Helvetica Neue",Helvetica,Arial,"LXGW WenKai Screen","Noto Color Emoji",sans-serif;
+    --body-font-famliy: "Theme Latin Serif","LXGW WenKai Screen","Noto Color Emoji","Helvetica Neue",Helvetica,Arial,sans-serif;
     --code-font-famliy: "Maple Mono NF CN","Noto Color Emoji","Helvetica Neue",Helvetica,Arial,sans-serif
 }
 

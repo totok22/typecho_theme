@@ -30,7 +30,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
             }
         </style>
     <?php endif; ?>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('assets/katex/katex.min.css'); ?>">
     <link id="highlightThemeCss" rel="stylesheet" href="//static-lab.6os.net/highlight/11.11.1/styles/atom-one-light.min.css">
     <script>
         (function() {

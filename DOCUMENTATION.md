@@ -914,7 +914,7 @@ class_exists('playback_Plugin')
 | 依赖 | 版本 | CDN |
 |------|------|-----|
 | jQuery | 3.6.0 | static-lab.6os.net |
-| KaTeX | 0.16.25 | cdn.jsdelivr.net |
+| KaTeX | 0.16.28 | 主题本地 assets/katex |
 | Highlight.js | 11.11.1 | static-lab.6os.net |
 | jquery.pjax | 2.0.1 | static-lab.6os.net |
 | NProgress | 0.2.0 | static-lab.6os.net |

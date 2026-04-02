@@ -94,8 +94,8 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 </footer>
 <?php $this->options->analyticsCode(); ?>
 <script src="//static-lab.6os.net/jquery/3.6.0/jquery.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js"></script>
+<script src="<?php $this->options->themeUrl('assets/katex/katex.min.js'); ?>"></script>
+<script src="<?php $this->options->themeUrl('assets/katex/auto-render.min.js'); ?>"></script>
 <script src="//static-lab.6os.net/highlight/11.11.1/highlight.min.js"></script>
 <?php if ($this->options->pjaxStatus == 'yes'): ?>
     <script src="//static-lab.6os.net/jquery-pjax/2.0.1/jquery.pjax.min.js"></script>
