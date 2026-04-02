@@ -2,8 +2,8 @@
  * 全局样式（@import 必须放在最前面）
  * --------------- */
 @import url("//static-lab.6os.net/MapleMono-NF-CN/7.900/result.css");
-@import url("//static-lab.6os.net/DreamHanSerifCN/3.02/W8/result.css");
 @import url("//static-lab.6os.net/noto-color-emoji/1/result.css");
+@import url('https://npm.elemecdn.com/lxgw-wenkai-screen-webfont/style.css');
 
 /* ------------------
  * 阅读进度条样式
@@ -30,7 +30,7 @@
     --secondary-color: #999999;
     --border-color: #EEEEEE;
     --muted-color: #F5F5F5;
-    --body-font-famliy: "Dream Han Serif CN W8","Noto Color Emoji","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --body-font-famliy: "Helvetica Neue",Helvetica,Arial,"LXGW WenKai Screen","Noto Color Emoji",sans-serif;
     --code-font-famliy: "Maple Mono NF CN","Noto Color Emoji","Helvetica Neue",Helvetica,Arial,sans-serif
 }
 

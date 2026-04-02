@@ -95,7 +95,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 <?php $this->options->analyticsCode(); ?>
 <script src="//static-lab.6os.net/jquery/3.6.0/jquery.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+<script src="//cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js"></script>
 <script src="//static-lab.6os.net/highlight/11.11.1/highlight.min.js"></script>
 <?php if ($this->options->pjaxStatus == 'yes'): ?>
     <script src="//static-lab.6os.net/jquery-pjax/2.0.1/jquery.pjax.min.js"></script>
@@ -796,6 +796,48 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         });
     }
 
+    function renderPostMath() {
+        if (typeof renderMathInElement !== 'function') {
+            return;
+        }
+
+        $('.post-content').each(function() {
+            if (this.dataset.mathRendered === 'true') {
+                return;
+            }
+
+            renderMathInElement(this, {
+                delimiters: [
+                    {
+                        left: '$$',
+                        right: '$$',
+                        display: true
+                    },
+                    {
+                        left: '$',
+                        right: '$',
+                        display: false
+                    },
+                    {
+                        left: '\\(',
+                        right: '\\)',
+                        display: false
+                    },
+                    {
+                        left: '\\[',
+                        right: '\\]',
+                        display: true
+                    }
+                ],
+                ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option'],
+                throwOnError: false,
+                strict: false
+            });
+
+            this.dataset.mathRendered = 'true';
+        });
+    }
+
     // 初始化main容器
     function initMain() {
         // 先初始化代码块复制按钮（包装pre元素）
@@ -808,43 +850,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
         hljs.highlightAll();
 
         // 渲染LaTeX/KaTeX数学公式
-        if (typeof renderMathInElement === 'function') {
-            $('.post-content').each(function() {
-                renderMathInElement(this, {
-                    delimiters: [
-                        // 块级：$$ ... $$（
-                        {
-                            left: '$$',
-                            right: '$$',
-                            display: true
-                        },
-                        // 行内：$ ... $
-                        {
-                            left: '$',
-                            right: '$',
-                            display: false,
-                            // 只有当 $ 前不是字母/数字/$，且 $ 后不是字母/数字/$ 时才匹配
-                            allowedPrecedes: '(?:^|[^\w\$])', // 前不能是单词字符或 $
-                            allowedFollows: '(?:^|[^\w\$])' // 后不能是单词字符或 $
-                        },
-                        // LaTeX 标准行内：\( ... \)
-                        {
-                            left: '\\(',
-                            right: '\\)',
-                            display: false
-                        },
-                        // LaTeX 标准块级：\[ ... \]（
-                        {
-                            left: '\\[',
-                            right: '\\]',
-                            display: true
-                        }
-                    ],
-                    throwOnError: false,
-                    strict: false // 避免控制台刷 warning
-                });
-            });
-        }
+        renderPostMath();
 
         <?php if ($this->options->imageLazyloadStatus == 'yes'): ?>
         // 图片懒加载
