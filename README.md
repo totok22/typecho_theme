@@ -60,6 +60,16 @@ $$
 ![图片标题](https://img.p0li.space/img/20260402xxxx.png)
 ```
 
+- 支持在图片标题中追加尺寸参数（竖线后面）：
+
+```md
+![图片标题|300](https://img.p0li.space/img/20260402xxxx.png)      # 宽度 300px
+![图片标题|50%](https://img.p0li.space/img/20260402xxxx.png)      # 宽度 50%
+![图片标题|300x200](https://img.p0li.space/img/20260402xxxx.png)  # 宽 300px，高 200px
+```
+
+- 注意：尺寸参数写在 `[]` 内部的标题后面，使用英文竖线 `|` 分隔。
+
 - 如需配置 PicGo，或使用车队共用电脑上的 PicGo，联系 [我](mailto:3226534205@qq.com)。
 
 ### PicGo 上传

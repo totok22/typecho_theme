@@ -863,27 +863,69 @@ class Widget_Post_Recent_Filtered extends Widget_Abstract_Contents {
 function parseContent($content) {
     $options = Helper::options();
     
-    // 文章图片处理
-    $imagePattern = '/<img.*?src="(.*?)".*?alt="(.*?)".*?>/i';
     $defaultImageUrl = $options->imageLazyloadStatus == 'yes' ? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAACQCAMAAADQvUWjAAABP2lDQ1BpY2MAAHicfZC/SwJxGMY/11WWWA05NBQcJU0FUUtTgYZOEfgj1Kbz/FGgdt33QprLoaloiEZrCaLZxhz6A4KgIQqirdWghpKLrw5aUM/yfnh4Xt6XB5TnvFEQ3RoUirYVDvm1eCKpuV5Q8dLPIGO6IczlSDAKIPSSMGwrzw+936PIeTe9rhfTO6/Xq8kFpbo7UY4FP1Yu+F/udEYYwBfgM0zLBkUDxku2KXkJ8BrrehqUODBlxRNJUPakn2vxieRUiy8lW9FwAJQaoOU6ONXBhfy2vCslv/dkirEI0AeMIggTwv9HpreZCRBgBmRfv3sQ2bnZ1pZnEXqeHOdtElyH0DhynM9Tx2mcgfoIta32/mYF5uugHrS91DFc7cPIQ9vzVWCoDNUbU7f0pqUCXdkNqJ/DQAKGb8G99g3j4l+xfPB+eQAAABtQTFRF4ePp7e/1c3R31tjdoKKljY6Rx8nOtLa7XFxeR44UlQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAHhlWElmSUkqAAgAAAAFABIBAwABAAAAAQAAABoBBQABAAAASgAAABsBBQABAAAAUgAAACgBAwABAAAAAgAAAGmHBAABAAAAWgAAAAAAAABJGQEA6AMAAEkZAQDoAwAAAgACoAQAAQAAAAABAAADoAQAAQAAAJAAAAAAAAAApI/SzwAAAiJJREFUeJzt19uO2zAMRVHy8Kb//+KCmmaaFgXaVwd7AfEgyvhBx6JEmwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwnf139z7Hvb/vV3wZ///mZOiIsVoeZRYZl+J2qWef7v/qMu2X397yz7fFOZSnXSTfP43Mqlfdhp+6fZRam7LTTVa+btZk93AkfmUW42s01pu459yn7bACRMzluOaqUHfOK9wAeHsIJP1V55GqzUBxVSbsepnRS6jOj8u6ojGhNZJqp9q57uavlsY7tes9jG4DnaZXNCdN4WMqzQu45nlmntlIqtwYUWxN9L48OQJNeR+Z3IkdeatXcIvAsnwzZBnB3hEir9mgL3ZvDNrhnBxAeJVVvAFk7Y53u3oLwSs9XAFOnVOocV/oO3pufH0Bn5dzZtXXLp7rkeQPQ/ArAZ4sh7oDv6fFzD6ivDfOxtIf7aCx2D2hFdpXO10mn8JpXCajqpKKrdtfTtg7aLuLhK+CYZW5Dc0+Blk11n3vU+5S/BXDjmfZzy/8eflsCTz8GZW6xh909BVrRkTW1vYHXuKtbYTV+F0ZmxCm/TeOnNEI5Mz2qPfv8roDZBqiOdW1LZH0ytWOTcm+1Mj8tgNzPDaBirOuMe1h15NlH7z69DXHXtgVuOh8UQPjLnUxs199f7zh34H2Di7CvFvlVAh/wLvR3/u93ZgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPtvPwB/Bwrf0wZNQgAAAABJRU5ErkJggg==' : '';
-    $actualImageUrl = ($options->weservStatus == 'yes' ? 'https://static-lab.6os.net/weserv/?url=' : '').'$1';
-    
-    if ($options->imageLazyloadStatus == 'yes') {
-        // 开启图片懒加载
-        $imageReplacement = '<img src="'.$defaultImageUrl.'" data-original="'.$actualImageUrl.'" alt="$2" class="lazyload">';
-    } else {
-        $imageReplacement = '<img src="'.$actualImageUrl.'" alt="$2">';
-    }
-    
-    if ($options->imageLightBoxStatus == 'yes') {
-        // 开启图片灯箱
-        $imageReplacement = '<a href="'.$actualImageUrl.'" data-fancybox="gallery">'.$imageReplacement.'</a>';
-    }
-    
-    // 文章内容处理
-    $content = preg_replace($imagePattern, $imageReplacement, $content);
-    
-    return $content;
+    $weservPrefix = $options->weservStatus == 'yes' ? 'https://static-lab.6os.net/weserv/?url=' : '';
+
+    // 支持 Markdown 图片 alt 中的尺寸语法：alt|300、alt|50%、alt|300x200
+    return preg_replace_callback('/<img\b[^>]*>/i', function ($matches) use ($options, $defaultImageUrl, $weservPrefix) {
+        $imgTag = $matches[0];
+
+        if (!preg_match('/\bsrc=(["\'])(.*?)\1/i', $imgTag, $srcMatch)) {
+            return $imgTag;
+        }
+
+        $src = $srcMatch[2];
+        $alt = '';
+        if (preg_match('/\balt=(["\'])(.*?)\1/i', $imgTag, $altMatch)) {
+            $alt = $altMatch[2];
+        }
+
+        $cleanAlt = $alt;
+        $sizeAttr = '';
+        $styleAttr = '';
+
+        if (preg_match('/^(.*?)\|(\d+)\s*x\s*(\d+)$/', $alt, $sizeMatch)) {
+            $cleanAlt = trim($sizeMatch[1]);
+            $width = (int) $sizeMatch[2];
+            $height = (int) $sizeMatch[3];
+            if ($width > 0) {
+                $sizeAttr .= ' width="' . $width . '"';
+            }
+            if ($height > 0) {
+                $sizeAttr .= ' height="' . $height . '"';
+            }
+        } elseif (preg_match('/^(.*?)\|(\d+)%$/', $alt, $sizeMatch)) {
+            $cleanAlt = trim($sizeMatch[1]);
+            $percent = (int) $sizeMatch[2];
+            if ($percent > 0) {
+                if ($percent > 100) {
+                    $percent = 100;
+                }
+                $styleAttr = ' style="width:' . $percent . '%;"';
+            }
+        } elseif (preg_match('/^(.*?)\|(\d+)$/', $alt, $sizeMatch)) {
+            $cleanAlt = trim($sizeMatch[1]);
+            $width = (int) $sizeMatch[2];
+            if ($width > 0) {
+                $sizeAttr = ' width="' . $width . '"';
+            }
+        }
+
+        $actualImageUrl = $weservPrefix . $src;
+        $safeAlt = htmlspecialchars($cleanAlt, ENT_QUOTES, 'UTF-8');
+
+        if ($options->imageLazyloadStatus == 'yes') {
+            $imageHtml = '<img src="' . $defaultImageUrl . '" data-original="' . $actualImageUrl . '" alt="' . $safeAlt . '" class="lazyload"' . $sizeAttr . $styleAttr . '>';
+        } else {
+            $imageHtml = '<img src="' . $actualImageUrl . '" alt="' . $safeAlt . '"' . $sizeAttr . $styleAttr . '>';
+        }
+
+        if ($options->imageLightBoxStatus == 'yes') {
+            $imageHtml = '<a href="' . $actualImageUrl . '" data-fancybox="gallery">' . $imageHtml . '</a>';
+        }
+
+        return $imageHtml;
+    }, $content);
 }
 
 /**
