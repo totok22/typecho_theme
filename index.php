@@ -9,7 +9,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');
 $this->widget('Widget_Post_Index_Filtered@index', 'pageSize=' . $this->options->pageSize)->to($indexPosts);
 ?>
-<div class="col-sm-12 <?php if ($this->options->sidebarStatus == 'yes'): ?>col-md-8<?php endif; ?>" id="main">
+<div class="col-sm-12 <?php if ($this->options->sidebarStatus == 'yes'): ?>col-md-8<?php endif; ?> post-list-main" id="main">
     <?php if ($indexPosts->have()): ?>
         <?php while ($indexPosts->next()): ?>
             <article class="post">

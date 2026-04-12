@@ -5,7 +5,7 @@
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 $this->need('header.php');
 ?>
-<div class="col-sm-12 <?php if ($this->options->sidebarStatus == 'yes'): ?>col-md-8<?php endif; ?>" id="main">
+<div class="col-sm-12 <?php if ($this->options->sidebarStatus == 'yes'): ?>col-md-8<?php endif; ?> post-list-main" id="main">
     <h3 class="archive-title"><?php $this->archiveTitle([
                 'category' => '分类 %s 下的文章',
                 'search'   => '包含关键字 %s 的文章',

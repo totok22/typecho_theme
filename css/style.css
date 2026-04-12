@@ -48,6 +48,11 @@
     --secondary-color: #999999;
     --border-color: #EEEEEE;
     --muted-color: #F5F5F5;
+    --post-list-item-padding-top: 1em;
+    --post-list-item-padding-bottom: 1.25em;
+    --post-list-title-margin: 0.45em;
+    --post-list-meta-margin-top: -0.1em;
+    --post-list-summary-margin-top: 0.5em;
     --body-font-famliy: "Theme Latin Serif","LXGW WenKai Screen","Noto Color Emoji","Helvetica Neue",Helvetica,Arial,sans-serif;
     --code-font-famliy: "Maple Mono NF CN","Noto Color Emoji","Helvetica Neue",Helvetica,Arial,sans-serif
 }
@@ -376,6 +381,24 @@ button:hover,input[type=submit]:hover {
     position: relative;
     padding: 1.5em 0 2em;
     border-bottom: 1px solid var(--border-color)
+}
+
+/* 列表页（首页/归档）使用更紧凑的文章卡片间距，不影响详情页。 */
+.post-list-main .post {
+    padding-top: var(--post-list-item-padding-top);
+    padding-bottom: var(--post-list-item-padding-bottom)
+}
+
+.post-list-main .post-title {
+    margin: var(--post-list-title-margin) 0
+}
+
+.post-list-main .post-meta {
+    margin-top: var(--post-list-meta-margin-top)
+}
+
+.post-list-main .post-summary {
+    margin-top: var(--post-list-summary-margin-top)
 }
 
 .post-title {
