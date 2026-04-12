@@ -994,6 +994,84 @@ function normalizeMarkdownHeadingSpacing($text) {
 }
 
 /**
+ * 规范化 Markdown 列表，避免有序/无序列表在同级相邻时被错误合并。
+ * 额外兼容部分富文本复制产生的项目符号（如 •/●/·）。
+ * @param string $text
+ * @return string
+ */
+function normalizeMarkdownListSpacing($text) {
+    $text = str_replace("\r\n", "\n", (string) $text);
+    $lines = explode("\n", $text);
+    $normalized = array();
+    $inFence = false;
+    $fenceChar = '';
+    $lastListType = null;
+    $lastListIndent = null;
+
+    for ($i = 0; $i < count($lines); $i++) {
+        $line = $lines[$i];
+
+        if (preg_match('/^\s*(```+|~~~+)/', $line, $fenceMatch)) {
+            $marker = $fenceMatch[1];
+            $markerChar = $marker[0];
+            if (!$inFence) {
+                $inFence = true;
+                $fenceChar = $markerChar;
+            } elseif ($fenceChar === $markerChar) {
+                $inFence = false;
+                $fenceChar = '';
+            }
+            $normalized[] = $line;
+            $lastListType = null;
+            $lastListIndent = null;
+            continue;
+        }
+
+        if ($inFence) {
+            $normalized[] = $line;
+            continue;
+        }
+
+        // 将 •/●/◦/· 项目符号归一为标准 Markdown 无序列表标记。
+        if (preg_match('/^(\s{0,3})[•●◦·]\s+(.*)$/u', $line, $bulletMatch)) {
+            $line = $bulletMatch[1] . '- ' . $bulletMatch[2];
+        }
+
+        $currentType = null;
+        $currentIndent = null;
+
+        if (preg_match('/^(\s{0,3})\d+[\.)]\s+\S/', $line, $olMatch)) {
+            $currentType = 'ol';
+            $currentIndent = strlen($olMatch[1]);
+        } elseif (preg_match('/^(\s{0,3})[-+*]\s+\S/', $line, $ulMatch)) {
+            $currentType = 'ul';
+            $currentIndent = strlen($ulMatch[1]);
+        }
+
+        if ($currentType !== null
+            && $lastListType !== null
+            && $currentType !== $lastListType
+            && $currentIndent === $lastListIndent
+            && !empty($normalized)
+            && trim($normalized[count($normalized) - 1]) !== '') {
+            $normalized[] = '';
+        }
+
+        $normalized[] = $line;
+
+        if ($currentType !== null) {
+            $lastListType = $currentType;
+            $lastListIndent = $currentIndent;
+        } elseif (trim($line) === '') {
+            $lastListType = null;
+            $lastListIndent = null;
+        }
+    }
+
+    return implode("\n", $normalized);
+}
+
+/**
  * 将 Markdown 文本渲染为 HTML
  * @param string|null $text
  * @return string
@@ -1014,6 +1092,7 @@ function renderMarkdownText($text) {
     $fixHeadingSpacing = !isset($options->markdownHeadingSpacingFixStatus) || $options->markdownHeadingSpacingFixStatus === 'yes';
     if ($fixHeadingSpacing) {
         $text = normalizeMarkdownHeadingSpacing($text);
+        $text = normalizeMarkdownListSpacing($text);
     }
     
     if (strpos($text, '<!--markdown-->') !== 0) {
