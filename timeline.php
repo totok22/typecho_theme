@@ -12,7 +12,7 @@ $this->need('header.php');
         <h1 class="post-title"><?php $this->title(); ?></h1>
         <div class="post-content" style="margin-top: 2em">
             <?php if (trim((string) $this->content) !== ''): ?>
-                <?php echo parseContent($this->content); ?>
+                <?php echo renderArchiveContent($this); ?>
             <?php endif; ?>
             <div class="timeline">
                 <?php

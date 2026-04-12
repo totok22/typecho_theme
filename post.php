@@ -75,7 +75,7 @@ $this->need('header.php');
                 </div>
             <?php endif; ?>
             <div class="post-content" style="margin-top: 2em">
-                <?php echo parseContent($this->content); ?>
+                <?php echo renderArchiveContent($this); ?>
             </div>
         <?php if ($this->options->statementStatus == 'yes'): ?>
             <div class="post-statement">

@@ -238,6 +238,17 @@ function themeConfig($form) {
         '是否启用图片灯箱',
             '开启后，点击文章内的图片，即可让图片展开放大'
     );
+
+    $markdownHeadingSpacingFixStatus = new Typecho_Widget_Helper_Form_Element_Radio(
+        'markdownHeadingSpacingFixStatus',
+        [
+            'yes'   => '是',
+            'no'    => '否'
+        ],
+        'yes',
+        '是否自动修复 Markdown 标题空行',
+        '开启后，渲染 Markdown 时会自动为 # 标题补齐上下空行，减少因格式不规范导致的显示异常'
+    );
     
     $postWordCountVisibleStatus = new Typecho_Widget_Helper_Form_Element_Radio(
         'postWordCountVisibleStatus',
@@ -462,6 +473,7 @@ function themeConfig($form) {
     $form->addInput($weservStatus);
     $form->addInput($imageLazyloadStatus);
     $form->addInput($imageLightBoxStatus);
+    $form->addInput($markdownHeadingSpacingFixStatus);
     $form->addInput($postWordCountVisibleStatus);
     $form->addInput($postReadingTimeVisibleStatus);
     $form->addInput($readingSpeed);
@@ -929,6 +941,59 @@ function parseContent($content) {
 }
 
 /**
+ * 规范化 Markdown 文本，自动为 ATX 标题补齐上下空行。
+ * 跳过代码围栏中的内容，避免破坏代码块。
+ * @param string $text
+ * @return string
+ */
+function normalizeMarkdownHeadingSpacing($text) {
+    $text = str_replace("\r\n", "\n", (string) $text);
+    $lines = explode("\n", $text);
+    $normalized = array();
+    $inFence = false;
+    $fenceChar = '';
+
+    for ($i = 0; $i < count($lines); $i++) {
+        $line = $lines[$i];
+
+        // 识别 ``` 或 ~~~ 代码围栏，围栏内不做标题空行修复。
+        if (preg_match('/^\s*(```+|~~~+)/', $line, $fenceMatch)) {
+            $marker = $fenceMatch[1];
+            $markerChar = $marker[0];
+            if (!$inFence) {
+                $inFence = true;
+                $fenceChar = $markerChar;
+            } elseif ($fenceChar === $markerChar) {
+                $inFence = false;
+                $fenceChar = '';
+            }
+            $normalized[] = $line;
+            continue;
+        }
+
+        $isHeading = !$inFence && preg_match('/^\s{0,3}#{1,6}\s+\S/', $line);
+        if ($isHeading) {
+            $prevLine = count($normalized) > 0 ? $normalized[count($normalized) - 1] : null;
+            if ($prevLine !== null && trim($prevLine) !== '') {
+                $normalized[] = '';
+            }
+
+            $normalized[] = $line;
+
+            $nextLine = ($i + 1) < count($lines) ? $lines[$i + 1] : null;
+            if ($nextLine !== null && trim($nextLine) !== '') {
+                $normalized[] = '';
+            }
+            continue;
+        }
+
+        $normalized[] = $line;
+    }
+
+    return implode("\n", $normalized);
+}
+
+/**
  * 将 Markdown 文本渲染为 HTML
  * @param string|null $text
  * @return string
@@ -944,6 +1009,12 @@ function renderMarkdownText($text) {
     }
     
     $text = str_replace("\r\n", "\n", $text);
+
+    $options = Helper::options();
+    $fixHeadingSpacing = !isset($options->markdownHeadingSpacingFixStatus) || $options->markdownHeadingSpacingFixStatus === 'yes';
+    if ($fixHeadingSpacing) {
+        $text = normalizeMarkdownHeadingSpacing($text);
+    }
     
     if (strpos($text, '<!--markdown-->') !== 0) {
         $text = '<!--markdown-->' . $text;
@@ -957,6 +1028,31 @@ function renderMarkdownText($text) {
     }
     
     return parseContent($html);
+}
+
+/**
+ * 渲染文章/页面正文：若原文是 Markdown，则走主题统一渲染链路。
+ * @param Widget_Archive $archive
+ * @return string
+ */
+function renderArchiveContent($archive) {
+    if (!is_object($archive) || !isset($archive->cid)) {
+        return parseContent(is_object($archive) && isset($archive->content) ? $archive->content : '');
+    }
+
+    $db = Typecho_Db::get();
+    $row = $db->fetchRow(
+        $db->select('text')
+            ->from('table.contents')
+            ->where('cid = ?', (int) $archive->cid)
+            ->limit(1)
+    );
+
+    if ($row && isset($row['text']) && strpos($row['text'], '<!--markdown-->') === 0) {
+        return renderMarkdownText(substr($row['text'], 15));
+    }
+
+    return parseContent($archive->content);
 }
 
 /**

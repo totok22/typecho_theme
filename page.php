@@ -9,7 +9,7 @@ $this->need('header.php');
     <article class="post">
         <h1 class="post-title"><?php $this->title(); ?></h1>
         <div class="post-content" style="margin-top: 2em">
-            <?php echo parseContent($this->content); ?>
+            <?php echo renderArchiveContent($this); ?>
         </div>
     </article>
     <?php $this->need('comments.php'); ?>
